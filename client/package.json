@@ -2,19 +2,6 @@
   "name": "helvetiapuborder-client",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "@types/node": "^16.18.68",
-    "@types/qrcode": "^1.5.5",
-    "@types/react": "^18.2.42",
-    "@types/react-dom": "^18.2.17",
-    "qrcode": "^1.5.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -38,6 +25,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://localhost:3001"
+  }
 }
