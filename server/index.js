@@ -115,10 +115,7 @@ app.get('/api/orders', (req, res) => {
 
   // Return full orders that contain at least one item for the requested category
   const filteredOrders = pendingOrders.filter(order => 
-    order.items.some(item => {
-      const menuItem = menu.find(mi => mi.id === item.id);
-      return menuItem && menuItem.category === category;
-    })
+    order.items.some(item => item.category === category)
   );
 
   res.json(filteredOrders);
