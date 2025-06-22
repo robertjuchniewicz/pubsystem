@@ -4,6 +4,7 @@ import { Order } from '../types';
 const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -17,10 +18,13 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
       setOrders(data);
     } catch (error) {
       console.error('Fehler beim Laden der Bestellungen:', error);
+    } finally {
+      setLoading(false);
     }
   }, [category, orders, soundEnabled]);
 
   useEffect(() => {
+    fetchOrders();
     const interval = setInterval(fetchOrders, 5000);
     return () => clearInterval(interval);
   }, [fetchOrders]);
@@ -86,7 +90,9 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
         </label>
       </div>
       <div className="order-list">
-        {orders.length === 0 ? (
+        {loading ? (
+          <p className="no-orders">Lade Daten...</p>
+        ) : orders.length === 0 ? (
           <p className="no-orders">Keine offenen Bestellungen.</p>
         ) : (
           orders.map(order => {
