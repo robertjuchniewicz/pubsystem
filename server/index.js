@@ -72,7 +72,11 @@ app.put('/api/menu/:id', (req, res) => {
 app.post('/api/orders', (req, res) => {
   const { tableNumber, items } = req.body;
   
-  if (!tableNumber || !items || items.length === 0) {
+  console.log('--- ✅ OTRZYMANO NOWE ZAMÓWIENIE ---');
+  console.log('Dane z przeglądarki:', JSON.stringify(req.body, null, 2));
+
+  if (!tableNumber || !items || !Array.isArray(items) || items.length === 0) {
+    console.error('Błąd walidacji: Brak numeru stołu lub produktów.');
     return res.status(400).json({ error: 'Tischnummer und Bestellpositionen sind erforderlich' });
   }
   
@@ -89,22 +93,33 @@ app.post('/api/orders', (req, res) => {
     pizzeriaStatus: 'pending'
   };
   
+  console.log('Utworzony obiekt zamówienia (przed zapisem):', JSON.stringify(order, null, 2));
+  
   orders.push(order);
-  res.json({ success: true, orderId: order.id });
+  console.log(`Zamówienie ${order.id} zapisane. Liczba aktywnych zamówień: ${orders.filter(o => o.status === 'pending').length}`);
+  res.status(201).json({ success: true, orderId: order.id });
 });
 
 app.get('/api/orders', (req, res) => {
   const { category } = req.query;
+
+  console.log(`\n--- 🔎 POBIERANIE ZAMÓWIEŃ DLA KATEGORII: ${category} ---`);
+  console.log(`Liczba wszystkich zamówień w pamięci: ${orders.length}`);
+
   if (!category) {
+    console.error('Błąd walidacji: Kategoria jest wymagana.');
     return res.status(400).json({ error: 'Kategorie ist erforderlich' });
   }
 
   const pendingOrders = orders.filter(order => order.status === 'pending');
+  console.log(`Znaleziono ${pendingOrders.length} oczekujących zamówień.`);
 
-  // Return full orders that contain at least one item for the requested category
   const filteredOrders = pendingOrders.filter(order => 
     order.items.some(item => item.category === category)
   );
+  
+  console.log(`Po filtracji, znaleziono ${filteredOrders.length} zamówień dla tej kategorii.`);
+  console.log('Wysyłane zamówienia:', JSON.stringify(filteredOrders, null, 2));
 
   res.json(filteredOrders);
 });
