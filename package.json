@@ -9,7 +9,6 @@
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "cd client && npm run build",
-    "postbuild": "npm run build",
     "heroku-postbuild": "npm run build"
   },
   "keywords": [],
