@@ -9,8 +9,8 @@ const AdminPanel: React.FC = () => {
   const [newItem, setNewItem] = useState({
     name: '',
     price: '',
-    category: 'pub' as 'pub' | 'pizzeria',
-    description: ''
+    category: 'pub',
+    description: '',
   });
 
   const fetchMenuItems = useCallback(async () => {
@@ -34,6 +34,25 @@ const AdminPanel: React.FC = () => {
     setEditingItem({ ...item });
   };
 
+  const handleCancelEdit = () => {
+    setEditingItem(null);
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    if (!editingItem) return;
+    const { name, value } = e.target;
+    setEditingItem({ ...editingItem, [name]: value });
+  };
+
+  const handleNewItemChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setNewItem(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
@@ -48,23 +67,28 @@ const AdminPanel: React.FC = () => {
       setEditingItem(null);
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
-      alert('Fehler beim Speichern');
+      alert('Fehler beim Speichern der Änderungen.');
     }
   };
 
-  const handleDeleteItem = async (id: number) => {
-    if (!window.confirm('Sind Sie sicher, dass Sie diesen Menüpunkt löschen möchten?')) {
+  const handleAddNewItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItem.name || !newItem.price) {
+      alert('Name and price are required.');
       return;
     }
-
     try {
-      await fetch(`/api/menu/${id}`, {
-        method: 'DELETE',
+      await fetch('/api/menu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newItem, id: Date.now() }), // Use a temporary ID
       });
       await fetchMenuItems();
+      setNewItem({ name: '', price: '', category: 'pub', description: '' });
+      setShowAddForm(false);
     } catch (error) {
-      console.error('Fehler beim Löschen:', error);
-      alert('Fehler beim Löschen');
+      console.error('Fehler beim Hinzufügen:', error);
+      alert('Fehler beim Hinzufügen des neuen Artikels.');
     }
   };
 
@@ -82,206 +106,114 @@ const AdminPanel: React.FC = () => {
     }
   };
 
-  const handleAddNewItem = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newItem.name || !newItem.price) {
-      alert('Name and price are required.');
-      return;
-    }
+  const handleDeleteItem = async (id: number) => {
+    if (!window.confirm('Sind Sie sicher, dass Sie diesen Menüpunkt löschen möchten?')) return;
     try {
-      await fetch('/api/menu', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...newItem, id: Date.now() }),
+      await fetch(`/api/menu/${id}`, {
+        method: 'DELETE',
       });
       await fetchMenuItems();
-      setNewItem({ name: '', price: '', category: 'pub', description: '' });
-      setShowAddForm(false);
     } catch (error) {
-      console.error('Fehler beim Hinzufügen:', error);
-      alert('Fehler beim Hinzufügen');
+      console.error('Error deleting item:', error);
     }
   };
 
+
   if (loading) {
-    return (
-      <div className="admin-panel">
-        <div className="admin-header">
-          <h1>Lade Speisekarte...</h1>
-        </div>
-      </div>
-    );
+    return <div>Lade Menü...</div>;
   }
 
   return (
     <div className="admin-panel">
-      <div className="admin-header">
-        <h1>Speisekarte verwalten</h1>
-        <button 
-          className="add-btn"
-          onClick={() => setShowAddForm(!showAddForm)}
-        >
-          {showAddForm ? 'Abbrechen' : 'Neuen Menüpunkt hinzufügen'}
-        </button>
-      </div>
+      <h1>Menüverwaltung</h1>
+
+      <button onClick={() => setShowAddForm(!showAddForm)} className="add-new-btn">
+        {showAddForm ? 'Formular schließen' : 'Neuen Artikel hinzufügen'}
+      </button>
 
       {showAddForm && (
-        <div className="add-form">
-          <h3>Neuen Menüpunkt hinzufügen</h3>
-          <div className="form-row">
-            <input
-              type="text"
-              placeholder="Name"
-              value={newItem.name}
-              onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-            />
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Preis"
-              value={newItem.price}
-              onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
-            />
-          </div>
-          <div className="form-row">
-            <select
-              value={newItem.category}
-              onChange={(e) => setNewItem({ ...newItem, category: e.target.value as 'pub' | 'pizzeria' })}
-            >
-              <option value="pub">PUB</option>
-              <option value="pizzeria">Pizzeria</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Beschreibung"
-              value={newItem.description}
-              onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-            />
-          </div>
-          <button className="save-btn" onClick={handleAddNewItem}>
-            Hinzufügen
-          </button>
-        </div>
+        <form onSubmit={handleAddNewItem} className="add-item-form">
+          <h3>Neuen Artikel hinzufügen</h3>
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={newItem.name}
+            onChange={handleNewItemChange}
+          />
+          <input
+            type="number"
+            name="price"
+            placeholder="Preis"
+            value={newItem.price}
+            onChange={handleNewItemChange}
+          />
+          <select name="category" value={newItem.category} onChange={handleNewItemChange}>
+            <option value="pub">PUB</option>
+            <option value="pizzeria">Pizzeria</option>
+          </select>
+          <textarea
+            name="description"
+            placeholder="Beschreibung"
+            value={newItem.description}
+            onChange={handleNewItemChange}
+          />
+          <button type="submit">Hinzufügen</button>
+        </form>
       )}
 
-      <div className="menu-sections">
-        <div className="menu-section">
-          <h2>PUB Artikel</h2>
-          <div className="menu-items">
-            {menuItems
-              .filter(item => item.category === 'pub')
-              .map((item) => (
-                <div key={item.id} className={`menu-item ${!item.available ? 'unavailable' : ''}`}>
-                  {editingItem?.id === item.id ? (
-                    <div className="edit-form">
-                      <input
-                        type="text"
-                        value={editingItem.name}
-                        onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                      />
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={editingItem.price}
-                        onChange={(e) => setEditingItem({ ...editingItem, price: parseFloat(e.target.value) })}
-                      />
-                      <input
-                        type="text"
-                        value={editingItem.description}
-                        onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                      />
-                      <div className="edit-actions">
-                        <button onClick={handleSaveChanges}>Speichern</button>
-                        <button onClick={() => setEditingItem(null)}>Abbrechen</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="item-content">
-                      <div className="item-info">
-                        <h3>{item.name}</h3>
-                        <p>{item.description}</p>
-                        <span className="price">€{item.price.toFixed(2)}</span>
-                        <span className={`status ${item.available ? 'available' : 'unavailable'}`}>
-                          {item.available ? 'Verfügbar' : 'Nicht verfügbar'}
-                        </span>
-                      </div>
-                      <div className="item-actions">
-                        <button onClick={() => handleEdit(item)}>Bearbeiten</button>
-                        <button 
-                          onClick={() => handleToggleAvailability(item)}
-                          className={item.available ? 'hide-btn' : 'show-btn'}
-                        >
-                          {item.available ? 'Verstecken' : 'Anzeigen'}
-                        </button>
-                        <button onClick={() => handleDeleteItem(item.id)} className="delete-btn">
-                          Löschen
-                        </button>
-                      </div>
-                    </div>
-                  )}
+      <div className="menu-list">
+        {menuItems.map(item => (
+          <div key={item.id} className="menu-item-admin">
+            {editingItem && editingItem.id === item.id ? (
+              <form onSubmit={handleSaveChanges} className="edit-form">
+                <input
+                  type="text"
+                  name="name"
+                  value={editingItem.name}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="number"
+                  name="price"
+                  value={editingItem.price}
+                  onChange={handleInputChange}
+                />
+                <select name="category" value={editingItem.category} onChange={handleInputChange}>
+                    <option value="pub">PUB</option>
+                    <option value="pizzeria">Pizzeria</option>
+                </select>
+                <textarea
+                  name="description"
+                  value={editingItem.description}
+                  onChange={handleInputChange}
+                />
+                <div className="edit-actions">
+                  <button type="submit">Speichern</button>
+                  <button type="button" onClick={handleCancelEdit}>Abbrechen</button>
                 </div>
-              ))}
-          </div>
-        </div>
-
-        <div className="menu-section">
-          <h2>Pizzeria Artikel</h2>
-          <div className="menu-items">
-            {menuItems
-              .filter(item => item.category === 'pizzeria')
-              .map((item) => (
-                <div key={item.id} className={`menu-item ${!item.available ? 'unavailable' : ''}`}>
-                  {editingItem?.id === item.id ? (
-                    <div className="edit-form">
-                      <input
-                        type="text"
-                        value={editingItem.name}
-                        onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                      />
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={editingItem.price}
-                        onChange={(e) => setEditingItem({ ...editingItem, price: parseFloat(e.target.value) })}
-                      />
-                      <input
-                        type="text"
-                        value={editingItem.description}
-                        onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                      />
-                      <div className="edit-actions">
-                        <button onClick={handleSaveChanges}>Speichern</button>
-                        <button onClick={() => setEditingItem(null)}>Abbrechen</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="item-content">
-                      <div className="item-info">
-                        <h3>{item.name}</h3>
-                        <p>{item.description}</p>
-                        <span className="price">€{item.price.toFixed(2)}</span>
-                        <span className={`status ${item.available ? 'available' : 'unavailable'}`}>
-                          {item.available ? 'Verfügbar' : 'Nicht verfügbar'}
-                        </span>
-                      </div>
-                      <div className="item-actions">
-                        <button onClick={() => handleEdit(item)}>Bearbeiten</button>
-                        <button 
-                          onClick={() => handleToggleAvailability(item)}
-                          className={item.available ? 'hide-btn' : 'show-btn'}
-                        >
-                          {item.available ? 'Verstecken' : 'Anzeigen'}
-                        </button>
-                        <button onClick={() => handleDeleteItem(item.id)} className="delete-btn">
-                          Löschen
-                        </button>
-                      </div>
-                    </div>
-                  )}
+              </form>
+            ) : (
+              <>
+                <div className="item-info">
+                  <strong>{item.name}</strong> - €{Number(item.price).toFixed(2)} ({item.category})
+                  <span className={item.available ? 'status-available' : 'status-hidden'}>
+                    {item.available ? 'Sichtbar' : 'Versteckt'}
+                  </span>
                 </div>
-              ))}
+                <div className="item-actions">
+                  <button onClick={() => handleEdit(item)}>Bearbeiten</button>
+                  <button onClick={() => handleToggleAvailability(item)}>
+                    {item.available ? 'Verstecken' : 'Anzeigen'}
+                  </button>
+                  <button onClick={() => handleDeleteItem(item.id)} className="delete-btn">
+                    Löschen
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -91,7 +91,7 @@ app.put('/api/menu/:id', (req, res) => {
 app.post('/api/orders', (req, res) => {
   const { tableNumber, items } = req.body;
   if (!tableNumber || !items || items.length === 0) {
-    return res.status(400).json({ error: 'Tischnummer und Artikel sind erforderlich' });
+    return res.status(400).json({ success: false, message: 'Tischnummer und Artikel sind erforderlich' });
   }
   const newOrder = {
     id: uuidv4(),
@@ -101,7 +101,13 @@ app.post('/api/orders', (req, res) => {
     createdAt: new Date()
   };
   orders.push(newOrder);
-  res.status(201).json(newOrder);
+  
+  // Send back a success response in the format the frontend expects
+  res.status(201).json({ 
+    success: true, 
+    message: `Ihre Bestellung für Tisch ${tableNumber} wurde erfolgreich aufgenommen!`,
+    order: newOrder 
+  });
 });
 
 app.get('/api/orders', (req, res) => {
