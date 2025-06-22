@@ -15,16 +15,16 @@ app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 // In-memory data storage (should match your original, correct data structure)
 let menu = [
-  { id: '1', name: 'Pizza Margherita', price: 12.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Basilikum', available: true },
-  { id: '2', name: 'Pizza Salami', price: 14.00, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Salami', available: true },
-  { id: '3', name: 'Bier 0.5L', price: 4.50, category: 'pub', description: 'Helles Bier vom Fass', available: true },
-  { id: '4', name: 'Wein 0.2L', price: 5.00, category: 'pub', description: 'Rotwein oder Weißwein', available: true },
-  { id: '5', name: 'Cola 0.3L', price: 3.50, category: 'pub', description: 'Eisgekühlte Cola', available: true },
-  { id: '6', name: 'Pizza Quattro Stagioni', price: 16.00, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Schinken, Pilze, Artischocken, Oliven', available: true },
-  { id: '7', name: 'Pizza Diavola', price: 15.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Salami, Peperoni', available: true },
-  { id: '8', name: 'Weißbier 0.5L', price: 5.00, category: 'pub', description: 'Bayerisches Weißbier', available: true },
-  { id: '9', name: 'Apfelsaft 0.3L', price: 3.00, category: 'pub', description: 'Frischer Apfelsaft', available: true },
-  { id: '10', name: 'Pizza Vegetariana', price: 13.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Paprika, Zucchini, Aubergine', available: true }
+  { id: 1, name: 'Pizza Margherita', price: 12.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Basilikum', available: true },
+  { id: 2, name: 'Pizza Salami', price: 14.00, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Salami', available: true },
+  { id: 3, name: 'Bier 0.5L', price: 4.50, category: 'pub', description: 'Helles Bier vom Fass', available: true },
+  { id: 4, name: 'Wein 0.2L', price: 5.00, category: 'pub', description: 'Rotwein oder Weißwein', available: true },
+  { id: 5, name: 'Cola 0.3L', price: 3.50, category: 'pub', description: 'Eisgekühlte Cola', available: true },
+  { id: 6, name: 'Pizza Quattro Stagioni', price: 16.00, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Schinken, Pilze, Artischocken, Oliven', available: true },
+  { id: 7, name: 'Pizza Diavola', price: 15.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Salami, Peperoni', available: true },
+  { id: 8, name: 'Weißbier 0.5L', price: 5.00, category: 'pub', description: 'Bayerisches Weißbier', available: true },
+  { id: 9, name: 'Apfelsaft 0.3L', price: 3.00, category: 'pub', description: 'Frischer Apfelsaft', available: true },
+  { id: 10, name: 'Pizza Vegetariana', price: 13.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Paprika, Zucchini, Aubergine', available: true }
 ];
 let orders = [];
 let orderHistory = [];
@@ -43,17 +43,14 @@ app.get('/api/menu/admin', (req, res) => {
 });
 
 app.post('/api/menu', (req, res) => {
-  const { name, price, category, description, available } = req.body;
-  if (!name || !price || !category) {
-    return res.status(400).json({ error: 'Name, Preis und Kategorie sind erforderlich' });
-  }
+  const { name, price, category, description } = req.body;
   const newItem = {
     id: menu.length > 0 ? Math.max(...menu.map(item => item.id)) + 1 : 1,
     name,
-    price: parseFloat(price),
+    price,
     category,
     description: description || '',
-    available: available !== undefined ? available : true
+    available: true
   };
   menu.push(newItem);
   res.status(201).json(newItem);
@@ -62,23 +59,14 @@ app.post('/api/menu', (req, res) => {
 app.put('/api/menu/:id', (req, res) => {
   const { id } = req.params;
   const { name, price, category, description, available } = req.body;
-  const itemIndex = menu.findIndex(item => item.id === parseInt(id));
-
-  if (itemIndex === -1) {
-    return res.status(404).json({ error: 'Menüpunkt nicht gefunden' });
+  const itemIndex = menu.findIndex(i => i.id === parseInt(id));
+  if (itemIndex > -1) {
+    const updatedItem = { ...menu[itemIndex], name, price, category, description, available };
+    menu[itemIndex] = updatedItem;
+    res.status(200).json(updatedItem);
+  } else {
+    res.status(404).json({ error: 'Produkt nicht gefunden' });
   }
-
-  const updatedItem = {
-    ...menu[itemIndex],
-    name: name || menu[itemIndex].name,
-    price: price ? parseFloat(price) : menu[itemIndex].price,
-    category: category || menu[itemIndex].category,
-    description: description !== undefined ? description : menu[itemIndex].description,
-    available: available !== undefined ? available : menu[itemIndex].available
-  };
-
-  menu[itemIndex] = updatedItem;
-  res.status(200).json(updatedItem);
 });
 
 app.post('/api/orders', (req, res) => {

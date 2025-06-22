@@ -84,7 +84,7 @@ const CustomerMenu: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tableNumber: parseInt(tableNumber!),
+          tableNumber: tableNumber,
           items: cart
         }),
       });
