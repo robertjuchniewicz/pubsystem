@@ -9,7 +9,7 @@ const AdminPanel: React.FC = () => {
 
   const fetchMenu = useCallback(async () => {
     try {
-      const response = await fetch('/api/menu/all'); // Fetch all items including unavailable
+      const response = await fetch('/api/menu/all');
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setMenu(data);
@@ -77,7 +77,7 @@ const AdminPanel: React.FC = () => {
 
       if (response.ok) {
         setEditingItem(null);
-        fetchMenu(); // Refresh menu
+        fetchMenu();
       } else {
         const errorData = await response.json();
         alert(`Fehler: ${errorData.error}`);
@@ -93,7 +93,7 @@ const AdminPanel: React.FC = () => {
       try {
         const response = await fetch(`/api/menu/${id}`, { method: 'DELETE' });
         if (response.ok) {
-          fetchMenu(); // Refresh menu
+          fetchMenu();
         } else {
           alert('Fehler beim Löschen des Produkts.');
         }

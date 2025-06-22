@@ -44,7 +44,7 @@ async function readFile(filePath, defaultValue) {
     const data = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
-    await fs.writeFile(filePath, JSON.stringify(defaultValue, null, 2));
+    await writeFile(filePath, defaultValue);
     return defaultValue;
   }
 }
@@ -55,7 +55,7 @@ async function writeFile(filePath, data) {
 
 async function initializeData() {
   try {
-    await fs.mkdir(DATA_DIR);
+    await fs.mkdir(DATA_DIR, { recursive: true });
   } catch (e) {
     if (e.code !== 'EEXIST') throw e;
   }
@@ -159,4 +159,89 @@ app.get('/api/orders', (req, res) => {
     order.items.some(item => item.category === category)
   );
   
-  console.log(`Po filtracji, znaleziono ${filteredOrders.length} zamówień dla tej kategorii.`
+  console.log(`Po filtracji, znaleziono ${filteredOrders.length} zamówień dla tej kategorii.`);
+
+  res.json(filteredOrders);
+});
+
+app.put('/api/orders/:id/section-status', async (req, res) => {
+  const { id } = req.params;
+  const { section, status } = req.body;
+  
+  const orderIndex = orders.findIndex(o => o.id === id);
+  if (orderIndex === -1) {
+    return res.status(404).json({ error: 'Bestellung nicht gefunden' });
+  }
+
+  const order = orders[orderIndex];
+  
+  if (section === 'pub') {
+    order.pubStatus = status;
+  } else if (section === 'pizzeria') {
+    order.pizzeriaStatus = status;
+  }
+  
+  await writeFile(ORDERS_FILE, orders);
+  
+  res.json({ success: true, order });
+});
+
+app.put('/api/orders/:id/archive', async (req, res) => {
+  const { id } = req.params;
+  const orderIndex = orders.findIndex(o => o.id === id);
+
+  if (orderIndex === -1) {
+    return res.status(404).json({ error: 'Bestellung nicht gefunden' });
+  }
+
+  const order = orders[orderIndex];
+  
+  order.status = 'completed';
+  order.deliveredAt = new Date().toISOString();
+    
+  orderHistory.push(order);
+  orders.splice(orderIndex, 1);
+
+  await writeFile(ORDERS_FILE, orders);
+  await writeFile(HISTORY_FILE, orderHistory);
+  
+  res.json({ success: true });
+});
+
+app.get('/api/orders/history', (req, res) => {
+  res.json(orderHistory);
+});
+
+app.delete('/api/menu/:id', async (req, res) => {
+  const { id } = req.params;
+  const initialLength = menu.length;
+  menu = menu.filter(i => i.id !== parseInt(id));
+
+  if (menu.length < initialLength) {
+    await writeFile(MENU_FILE, menu);
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Produkt nicht gefunden' });
+  }
+});
+
+// Catch-all handler for client-side routing
+app.get('*', (req, res) => {
+  const clientBuildPath = path.join(__dirname, '../client/build/index.html');
+  res.sendFile(clientBuildPath, (err) => {
+    if (err) {
+      res.status(500).send('Fehler beim Laden der Anwendung.');
+    }
+  });
+});
+
+initializeData().then(() => {
+  app.listen(port, () => {
+    console.log(`✅ Server läuft auf Port ${port}`);
+    console.log(`   Frontend verfügbar unter der Haupt-URL`);
+    console.log(`   API verfügbar unter /api`);
+  });
+}).catch(err => {
+  console.error("❌ Błąd inicjalizacji serwera:", err);
+  process.exit(1);
+});
