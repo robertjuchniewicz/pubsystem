@@ -14,12 +14,16 @@ const StaffPanel: React.FC<StaffPanelProps> = ({ category }) => {
   const fetchOrders = useCallback(async () => {
     try {
       const response = await fetch(`/api/orders?category=${category}`);
-      const data = await response.json();
-      setOrders(data);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data: Order[] = await response.json();
+      
+      if (data.length !== orders.length || JSON.stringify(data) !== JSON.stringify(orders)) {
+        setOrders(data);
+      }
     } catch (error) {
       console.error('Fehler beim Laden der Bestellungen:', error);
     }
-  }, [category]);
+  }, [category, orders]);
 
   useEffect(() => {
     // Create audio element for notifications
@@ -51,6 +55,7 @@ const StaffPanel: React.FC<StaffPanelProps> = ({ category }) => {
       
       // Remove completed/cancelled orders from the list
       setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
+      fetchOrders();
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Bestellung:', error);
     }
@@ -63,6 +68,7 @@ const StaffPanel: React.FC<StaffPanelProps> = ({ category }) => {
       });
       
       setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
+      fetchOrders();
     } catch (error) {
       console.error('Fehler beim Löschen der Bestellung:', error);
     }

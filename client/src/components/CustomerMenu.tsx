@@ -17,6 +17,7 @@ const CustomerMenu: React.FC = () => {
   const fetchMenuItems = async () => {
     try {
       const response = await fetch('/api/menu');
+      if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setMenuItems(data);
     } catch (error) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MenuItem } from '../types';
 
 const AdminPanel: React.FC = () => {
@@ -17,59 +17,51 @@ const AdminPanel: React.FC = () => {
     fetchMenuItems();
   }, []);
 
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = useCallback(async () => {
     try {
       const response = await fetch('/api/menu/admin');
-      const data = await response.json();
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data: MenuItem[] = await response.json();
       setMenuItems(data);
     } catch (error) {
       console.error('Fehler beim Laden der Speisekarte:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleEdit = (item: MenuItem) => {
     setEditingItem(item);
   };
 
-  const handleSave = async (item: MenuItem) => {
-    try {
-      const response = await fetch(`/api/menu/${item.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(item),
-      });
+  const handleSaveChanges = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
 
-      if (response.ok) {
-        await fetchMenuItems();
-        setEditingItem(null);
-      } else {
-        alert('Fehler beim Speichern');
-      }
+    try {
+      await fetch(`/api/menu/${editingItem.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingItem),
+      });
+      await fetchMenuItems();
+      setEditingItem(null);
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
       alert('Fehler beim Speichern');
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDeleteItem = async (id: number) => {
     if (!window.confirm('Sind Sie sicher, dass Sie diesen Menüpunkt löschen möchten?')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/menu/${id}`, {
+      await fetch(`/api/menu/${id}`, {
         method: 'DELETE',
       });
-
-      if (response.ok) {
-        await fetchMenuItems();
-      } else {
-        alert('Fehler beim Löschen');
-      }
+      await fetchMenuItems();
     } catch (error) {
       console.error('Fehler beim Löschen:', error);
       alert('Fehler beim Löschen');
@@ -78,31 +70,33 @@ const AdminPanel: React.FC = () => {
 
   const handleToggleAvailability = async (item: MenuItem) => {
     const updatedItem = { ...item, available: !item.available };
-    await handleSave(updatedItem);
+    try {
+      await fetch(`/api/menu/${item.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedItem),
+      });
+      await fetchMenuItems();
+    } catch (error) {
+      console.error('Error toggling availability:', error);
+    }
   };
 
-  const handleAddItem = async () => {
-    if (!newItem.name || !newItem.price || !newItem.description) {
-      alert('Bitte füllen Sie alle Felder aus');
+  const handleAddNewItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItem.name || !newItem.price) {
+      alert('Name and price are required.');
       return;
     }
-
     try {
-      const response = await fetch('/api/menu', {
+      await fetch('/api/menu', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newItem),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newItem, id: Date.now() }),
       });
-
-      if (response.ok) {
-        await fetchMenuItems();
-        setNewItem({ name: '', price: '', category: 'pub', description: '' });
-        setShowAddForm(false);
-      } else {
-        alert('Fehler beim Hinzufügen');
-      }
+      await fetchMenuItems();
+      setNewItem({ name: '', price: '', category: 'pub', description: '' });
+      setShowAddForm(false);
     } catch (error) {
       console.error('Fehler beim Hinzufügen:', error);
       alert('Fehler beim Hinzufügen');
@@ -164,7 +158,7 @@ const AdminPanel: React.FC = () => {
               onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
             />
           </div>
-          <button className="save-btn" onClick={handleAddItem}>
+          <button className="save-btn" onClick={handleAddNewItem}>
             Hinzufügen
           </button>
         </div>
@@ -197,7 +191,7 @@ const AdminPanel: React.FC = () => {
                         onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
                       />
                       <div className="edit-actions">
-                        <button onClick={() => handleSave(editingItem)}>Speichern</button>
+                        <button onClick={handleSaveChanges}>Speichern</button>
                         <button onClick={() => setEditingItem(null)}>Abbrechen</button>
                       </div>
                     </div>
@@ -219,7 +213,7 @@ const AdminPanel: React.FC = () => {
                         >
                           {item.available ? 'Verstecken' : 'Anzeigen'}
                         </button>
-                        <button onClick={() => handleDelete(item.id)} className="delete-btn">
+                        <button onClick={() => handleDeleteItem(item.id)} className="delete-btn">
                           Löschen
                         </button>
                       </div>
@@ -256,7 +250,7 @@ const AdminPanel: React.FC = () => {
                         onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
                       />
                       <div className="edit-actions">
-                        <button onClick={() => handleSave(editingItem)}>Speichern</button>
+                        <button onClick={handleSaveChanges}>Speichern</button>
                         <button onClick={() => setEditingItem(null)}>Abbrechen</button>
                       </div>
                     </div>
@@ -278,7 +272,7 @@ const AdminPanel: React.FC = () => {
                         >
                           {item.available ? 'Verstecken' : 'Anzeigen'}
                         </button>
-                        <button onClick={() => handleDelete(item.id)} className="delete-btn">
+                        <button onClick={() => handleDeleteItem(item.id)} className="delete-btn">
                           Löschen
                         </button>
                       </div>
