@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import QRCode from 'qrcode';
 
 const QRLabelGenerator: React.FC = () => {
-  const [baseUrl, setBaseUrl] = useState('http://localhost:3000');
+  const [baseUrl, setBaseUrl] = useState(window.location.origin);
   const [startTable, setStartTable] = useState(1);
   const [endTable, setEndTable] = useState(10);
   const [logo, setLogo] = useState<string | null>(null);
