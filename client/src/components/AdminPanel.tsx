@@ -13,10 +13,6 @@ const AdminPanel: React.FC = () => {
     description: ''
   });
 
-  useEffect(() => {
-    fetchMenuItems();
-  }, []);
-
   const fetchMenuItems = useCallback(async () => {
     try {
       const response = await fetch('/api/menu/admin');
@@ -24,14 +20,18 @@ const AdminPanel: React.FC = () => {
       const data: MenuItem[] = await response.json();
       setMenuItems(data);
     } catch (error) {
-      console.error('Fehler beim Laden der Speisekarte:', error);
+      console.error('Fehler beim Laden des Menüs:', error);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  useEffect(() => {
+    fetchMenuItems();
+  }, [fetchMenuItems]);
+
   const handleEdit = (item: MenuItem) => {
-    setEditingItem(item);
+    setEditingItem({ ...item });
   };
 
   const handleSaveChanges = async (e: React.FormEvent) => {
