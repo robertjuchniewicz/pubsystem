@@ -1,20 +1,31 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const fs = require('fs').promises;
 
 const app = express();
 const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
-// In-memory data storage (should match your original, correct data structure)
-let menu = [
+// --- Pamięć trwała (zapis do plików) ---
+
+const DATA_DIR = path.join(__dirname, 'data');
+const MENU_FILE = path.join(DATA_DIR, 'menu.json');
+const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const HISTORY_FILE = path.join(DATA_DIR, 'orderHistory.json');
+
+let menu = [];
+let orders = [];
+let orderHistory = [];
+
+const defaultMenu = [
   { id: 1, name: 'Pizza Margherita', price: 12.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Basilikum', available: true },
   { id: 2, name: 'Pizza Salami', price: 14.00, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Salami', available: true },
   { id: 3, name: 'Bier 0.5L', price: 4.50, category: 'pub', description: 'Helles Bier vom Fass', available: true },
@@ -26,8 +37,34 @@ let menu = [
   { id: 9, name: 'Apfelsaft 0.3L', price: 3.00, category: 'pub', description: 'Frischer Apfelsaft', available: true },
   { id: 10, name: 'Pizza Vegetariana', price: 13.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Paprika, Zucchini, Aubergine', available: true }
 ];
-let orders = [];
-let orderHistory = [];
+
+async function readFile(filePath, defaultValue) {
+  try {
+    await fs.access(filePath);
+    const data = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    await fs.writeFile(filePath, JSON.stringify(defaultValue, null, 2));
+    return defaultValue;
+  }
+}
+
+async function writeFile(filePath, data) {
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+}
+
+async function initializeData() {
+  try {
+    await fs.mkdir(DATA_DIR);
+  } catch (e) {
+    if (e.code !== 'EEXIST') throw e;
+  }
+  
+  menu = await readFile(MENU_FILE, defaultMenu);
+  orders = await readFile(ORDERS_FILE, []);
+  orderHistory = await readFile(HISTORY_FILE, []);
+  console.log('✅ Dane załadowane pomyślnie.');
+}
 
 // Routes
 app.get('/api', (req, res) => {
@@ -42,34 +79,37 @@ app.get('/api/menu/admin', (req, res) => {
   res.json(menu);
 });
 
-app.post('/api/menu', (req, res) => {
+app.post('/api/menu', async (req, res) => {
   const { name, price, category, description } = req.body;
   const newItem = {
     id: menu.length > 0 ? Math.max(...menu.map(item => item.id)) + 1 : 1,
     name,
     price,
     category,
-    description: description || '',
+    description,
     available: true
   };
   menu.push(newItem);
+  await writeFile(MENU_FILE, menu);
   res.status(201).json(newItem);
 });
 
-app.put('/api/menu/:id', (req, res) => {
+app.put('/api/menu/:id', async (req, res) => {
   const { id } = req.params;
   const { name, price, category, description, available } = req.body;
   const itemIndex = menu.findIndex(i => i.id === parseInt(id));
+
   if (itemIndex > -1) {
     const updatedItem = { ...menu[itemIndex], name, price, category, description, available };
     menu[itemIndex] = updatedItem;
-    res.status(200).json(updatedItem);
+    await writeFile(MENU_FILE, menu);
+    res.json(updatedItem);
   } else {
     res.status(404).json({ error: 'Produkt nicht gefunden' });
   }
 });
 
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
   const { tableNumber, items } = req.body;
   
   console.log('--- ✅ OTRZYMANO NOWE ZAMÓWIENIE ---');
@@ -96,6 +136,7 @@ app.post('/api/orders', (req, res) => {
   console.log('Utworzony obiekt zamówienia (przed zapisem):', JSON.stringify(order, null, 2));
   
   orders.push(order);
+  await writeFile(ORDERS_FILE, orders);
   console.log(`Zamówienie ${order.id} zapisane. Liczba aktywnych zamówień: ${orders.filter(o => o.status === 'pending').length}`);
   res.status(201).json({ success: true, orderId: order.id });
 });
@@ -124,7 +165,7 @@ app.get('/api/orders', (req, res) => {
   res.json(filteredOrders);
 });
 
-app.put('/api/orders/:id/section-status', (req, res) => {
+app.put('/api/orders/:id/section-status', async (req, res) => {
   const { id } = req.params;
   const { section, status } = req.body; // section: 'pub' or 'pizzeria', status: 'ready' or 'delivered'
   
@@ -139,23 +180,23 @@ app.put('/api/orders/:id/section-status', (req, res) => {
     order.pizzeriaStatus = status;
   }
   
-  // Check if both sections are delivered, then mark as completed
-  if (order.pubStatus === 'delivered' && order.pizzeriaStatus === 'delivered') {
+  const hasPubItems = order.items.some(item => item.category === 'pub');
+  const hasPizzeriaItems = order.items.some(item => item.category === 'pizzeria');
+
+  const pubReady = !hasPubItems || order.pubStatus === 'delivered';
+  const pizzeriaReady = !hasPizzeriaItems || order.pizzeriaStatus === 'delivered';
+  
+  if (pubReady && pizzeriaReady) {
     order.status = 'completed';
     order.deliveredAt = new Date().toISOString();
     
-    // Move to history
-    orderHistory.push({
-      id: order.id,
-      tableNumber: order.tableNumber,
-      items: order.items,
-      status: 'completed',
-      createdAt: order.createdAt,
-      deliveredAt: order.deliveredAt
-    });
-    
-    // Remove from active orders
+    orderHistory.push(order);
     orders = orders.filter(o => o.id !== id);
+
+    await writeFile(ORDERS_FILE, orders);
+    await writeFile(HISTORY_FILE, orderHistory);
+  } else {
+    await writeFile(ORDERS_FILE, orders);
   }
   
   res.json({ success: true, order });
@@ -198,7 +239,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Server läuft auf Port ${port}`);
-  console.log(`API verfügbar unter http://localhost:${port}/api`);
+initializeData().then(() => {
+  app.listen(port, () => {
+    console.log(`Server läuft auf Port ${port}`);
+    console.log(`API verfügbar unter http://localhost:${port}/api`);
+  });
+}).catch(err => {
+  console.error("Błąd inicjalizacji serwera:", err);
+  process.exit(1);
 }); 
