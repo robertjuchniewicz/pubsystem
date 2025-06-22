@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import './DashboardLayout.css';
 
 interface Stat {
   label: string;
