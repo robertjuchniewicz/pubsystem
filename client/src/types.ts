@@ -17,14 +17,26 @@ export interface CartItem {
 
 export interface Order {
   id: string;
-  tableNumber: number;
+  tableNumber: string;
   items: CartItem[];
-  timestamp: string;
   status: 'pending' | 'completed' | 'cancelled';
+  createdAt: string;
+  pubStatus: 'pending' | 'ready' | 'delivered';
+  pizzeriaStatus: 'pending' | 'ready' | 'delivered';
+  deliveredAt?: string;
+}
+
+export interface OrderHistory {
+  id: string;
+  tableNumber: string;
+  items: CartItem[];
+  status: 'completed' | 'cancelled';
+  createdAt: string;
+  deliveredAt?: string;
+  cancelledAt?: string;
 }
 
 export interface OrderResponse {
   success: boolean;
-  orderId: string;
-  message: string;
+  message?: string;
 } 

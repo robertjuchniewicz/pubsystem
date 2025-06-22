@@ -5,6 +5,7 @@ import StaffPanel from './components/StaffPanel';
 import AdminPanel from './components/AdminPanel';
 import QRLabelGenerator from './components/QRLabelGenerator';
 import Dashboard from './components/Dashboard';
+import OrderHistoryComponent from './components/OrderHistory';
 import './App.css';
 
 function App() {
@@ -12,13 +13,13 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/" element={<Dashboard />} />
           <Route path="/table/:tableNumber" element={<CustomerMenu />} />
           <Route path="/staff/pub" element={<StaffPanel category="pub" />} />
           <Route path="/staff/pizzeria" element={<StaffPanel category="pizzeria" />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/qr-labels" element={<QRLabelGenerator />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/history" element={<OrderHistoryComponent />} />
         </Routes>
       </div>
     </Router>

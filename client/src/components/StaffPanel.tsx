@@ -1,15 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Order } from '../types';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Order, CartItem } from '../types';
 
-interface StaffPanelProps {
-  category: 'pub' | 'pizzeria';
-}
-
-const StaffPanel: React.FC<StaffPanelProps> = ({ category }) => {
+const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) => {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const [lastOrderCount, setLastOrderCount] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -17,132 +11,184 @@ const StaffPanel: React.FC<StaffPanelProps> = ({ category }) => {
       if (!response.ok) throw new Error('Network response was not ok');
       const data: Order[] = await response.json();
       
-      if (data.length !== orders.length || JSON.stringify(data) !== JSON.stringify(orders)) {
-        setOrders(data);
+      if (data.length > orders.length && soundEnabled) {
+        playSound();
       }
+      setOrders(data);
     } catch (error) {
       console.error('Fehler beim Laden der Bestellungen:', error);
     }
-  }, [category, orders]);
+  }, [category, orders, soundEnabled]);
 
   useEffect(() => {
-    // Create audio element for notifications
-    audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-    
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 5000); // Poll every 5 seconds
-    
+    const interval = setInterval(fetchOrders, 5000);
     return () => clearInterval(interval);
-  }, [category, fetchOrders]);
+  }, [fetchOrders]);
 
-  useEffect(() => {
-    // Check for new orders and play sound if enabled
-    if (soundEnabled && orders.length > lastOrderCount && lastOrderCount > 0) {
-      audioRef.current?.play().catch(console.error);
-    }
-    setLastOrderCount(orders.length);
-  }, [orders, soundEnabled, lastOrderCount]);
+  const playSound = () => {
+    new Audio('/notification.mp3').play().catch(e => console.error("Konnte Audio nicht abspielen:", e));
+  };
 
-  const updateOrderStatus = async (orderId: string, status: 'completed' | 'cancelled') => {
+  const updateSectionStatus = async (orderId: string, status: 'ready' | 'delivered') => {
     try {
-      await fetch(`/api/orders/${orderId}/status`, {
+      await fetch(`/api/orders/${orderId}/section-status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section: category, status }),
       });
-      
-      // Remove completed/cancelled orders from the list
-      setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
-      fetchOrders();
+      fetchOrders(); // Immediately refetch to update the UI
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Bestellung:', error);
     }
   };
 
-  const deleteOrder = async (orderId: string) => {
-    try {
-      await fetch(`/api/orders/${orderId}`, {
-        method: 'DELETE',
-      });
-      
-      setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
-      fetchOrders();
-    } catch (error) {
-      console.error('Fehler beim Löschen der Bestellung:', error);
+  const cancelOrder = async (orderId: string) => {
+    if (window.confirm('Möchten Sie diese Bestellung wirklich stornieren?')) {
+      try {
+        await fetch(`/api/orders/${orderId}/cancel`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        fetchOrders();
+      } catch (error) {
+        console.error('Fehler beim Stornieren der Bestellung:', error);
+      }
     }
   };
 
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('de-DE', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'ready': return '#ffa500';
+      case 'delivered': return '#4CAF50';
+      default: return '#ff9800';
+    }
   };
 
-  const getCategoryTitle = () => {
-    return category === 'pub' ? 'PUB Bestellungen' : 'Pizzeria Bestellungen';
-  };
-
-  const getCategoryColor = () => {
-    return category === 'pub' ? 'pub' : 'pizzeria';
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'ready': return 'Bereit';
+      case 'delivered': return 'Ausgeliefert';
+      default: return 'In Bearbeitung';
+    }
   };
 
   return (
-    <div className="staff-panel">
-      <div className={`staff-header ${getCategoryColor()}`}>
-        <h1>{getCategoryTitle()}</h1>
-        <div 
-          className="sound-toggle"
-          onClick={() => setSoundEnabled(!soundEnabled)}
-        >
-          <span>🔊</span>
-          <span>{soundEnabled ? 'Ton an' : 'Ton aus'}</span>
-        </div>
+    <div className={`staff-panel ${category}`}>
+      <div className="staff-header">
+        <h1>Bestellungen - {category === 'pub' ? 'PUB' : 'Pizzeria'}</h1>
+        <label className="sound-toggle">
+          <input
+            type="checkbox"
+            checked={soundEnabled}
+            onChange={() => setSoundEnabled(!soundEnabled)}
+          />
+          Ton bei neuen Bestellungen
+        </label>
       </div>
+      <div className="order-list">
+        {orders.length === 0 ? (
+          <p className="no-orders">Keine offenen Bestellungen.</p>
+        ) : (
+          orders.map(order => {
+            const pizzeriaItems = order.items.filter(item => item.category === 'pizzeria');
+            const pubItems = order.items.filter(item => item.category === 'pub');
+            const currentSectionStatus = category === 'pub' ? order.pubStatus : order.pizzeriaStatus;
+            const otherSectionStatus = category === 'pub' ? order.pizzeriaStatus : order.pubStatus;
 
-      {orders.length === 0 ? (
-        <div className="no-orders">
-          <h2>Keine Bestellungen</h2>
-          <p>Warten auf neue Bestellungen...</p>
-        </div>
-      ) : (
-        <div className="orders-container">
-          {orders.map((order) => (
-            <div key={order.id} className={`order-card ${getCategoryColor()}`}>
-              <div className="order-header">
-                <div className="table-number">Tisch {order.tableNumber}</div>
-                <div className="order-time">{formatTime(order.timestamp)}</div>
+            return (
+              <div key={order.id} className="order-card">
+                <div className="order-header">
+                  <h3>Bestellung #{order.id.substring(0, 8)} (Tisch {order.tableNumber})</h3>
+                  <p className="order-time">
+                    {new Date(order.createdAt).toLocaleTimeString('de-DE')}
+                  </p>
+                </div>
+                
+                <div className="order-details">
+                  {pizzeriaItems.length > 0 && (
+                    <div className={`order-category-section ${category === 'pub' ? 'secondary' : ''}`}>
+                      <div className="section-header">
+                        <h4>Von der Pizzeria:</h4>
+                        {category === 'pizzeria' && (
+                          <span 
+                            className="status-badge"
+                            style={{ backgroundColor: getStatusColor(order.pizzeriaStatus) }}
+                          >
+                            {getStatusText(order.pizzeriaStatus)}
+                          </span>
+                        )}
+                      </div>
+                      <ul>
+                        {pizzeriaItems.map((item, index) => (
+                          <li key={`${item.menuItemId}-${index}`}>{item.quantity} x {item.name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {pubItems.length > 0 && (
+                    <div className={`order-category-section ${category === 'pizzeria' ? 'secondary' : ''}`}>
+                      <div className="section-header">
+                        <h4>Vom Pub:</h4>
+                        {category === 'pub' && (
+                          <span 
+                            className="status-badge"
+                            style={{ backgroundColor: getStatusColor(order.pubStatus) }}
+                          >
+                            {getStatusText(order.pubStatus)}
+                          </span>
+                        )}
+                      </div>
+                      <ul>
+                        {pubItems.map((item, index) => (
+                          <li key={`${item.menuItemId}-${index}`}>{item.quantity} x {item.name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="order-actions">
+                  {currentSectionStatus === 'pending' && (
+                    <button 
+                      onClick={() => updateSectionStatus(order.id, 'ready')} 
+                      className="action-btn ready-btn"
+                    >
+                      Bereit
+                    </button>
+                  )}
+                  
+                  {currentSectionStatus === 'ready' && (
+                    <button 
+                      onClick={() => updateSectionStatus(order.id, 'delivered')} 
+                      className="action-btn delivered-btn"
+                    >
+                      Ausgeliefert
+                    </button>
+                  )}
+                  
+                  {currentSectionStatus === 'delivered' && otherSectionStatus === 'delivered' && (
+                    <button 
+                      onClick={() => updateSectionStatus(order.id, 'delivered')} 
+                      className="action-btn complete-btn"
+                      disabled
+                    >
+                      Vollständig ausgeliefert
+                    </button>
+                  )}
+                  
+                  <button 
+                    onClick={() => cancelOrder(order.id)} 
+                    className="action-btn cancel-btn"
+                  >
+                    Stornieren
+                  </button>
+                </div>
               </div>
-              
-              <div className="order-items">
-                {order.items.map((item) => (
-                  <div key={item.menuItemId} className="order-item">
-                    <span className="item-name">{item.name}</span>
-                    <span className="item-quantity">x{item.quantity}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="order-actions">
-                <button 
-                  className="action-btn complete-btn"
-                  onClick={() => updateOrderStatus(order.id, 'completed')}
-                >
-                  Fertig
-                </button>
-                <button 
-                  className="action-btn delete-btn"
-                  onClick={() => deleteOrder(order.id)}
-                >
-                  Löschen
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            );
+          })
+        )}
+      </div>
     </div>
   );
 };

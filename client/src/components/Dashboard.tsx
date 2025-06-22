@@ -196,6 +196,24 @@ const Dashboard: React.FC = () => {
             </div>
           ))}
         </div>
+
+        <div className="dashboard-section">
+          <h2>Verwaltung</h2>
+          <div className="dashboard-links">
+            <a href="/admin" className="dashboard-link admin">
+              <h3>Menü verwalten</h3>
+              <p>Produkte hinzufügen, bearbeiten und Preise ändern</p>
+            </a>
+            <a href="/qr-labels" className="dashboard-link qr">
+              <h3>QR-Code-Tischschilder</h3>
+              <p>QR-Codes für Tische generieren und drucken</p>
+            </a>
+            <a href="/history" className="dashboard-link history">
+              <h3>Bestellhistorie</h3>
+              <p>Abgeschlossene und stornierte Bestellungen einsehen</p>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -15,26 +15,19 @@ app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 // In-memory data storage (should match your original, correct data structure)
 let menu = [
-  // Pizzeria
-  { id: 1, name: 'Margherita', category: 'pizzeria', price: 8.50, available: true, description: 'Tomatensauce, Mozzarella, Basilikum' },
-  { id: 2, name: 'Salami', category: 'pizzeria', price: 9.50, available: true, description: 'Tomatensauce, Mozzarella, Salami' },
-  { id: 3, name: 'Prosciutto', category: 'pizzeria', price: 10.00, available: true, description: 'Tomatensauce, Mozzarella, Schinken' },
-  { id: 4, name: 'Funghi', category: 'pizzeria', price: 9.00, available: true, description: 'Tomatensauce, Mozzarella, Pilze' },
-  { id: 5, name: 'Hawaii', category: 'pizzeria', price: 10.50, available: false, description: 'Tomatensauce, Mozzarella, Schinken, Ananas' },
-
-  // PUB
-  { id: 11, name: 'Helles Bier', category: 'pub', price: 4.50, available: true, description: '0,5L frisch gezapft' },
-  { id: 12, name: 'Dunkles Bier', category: 'pub', price: 4.50, available: true, description: '0,5L frisch gezapft' },
-  { id: 13, name: 'Weizenbier', category: 'pub', price: 5.00, available: true, description: '0,5L Flasche' },
-  { id: 14, name: 'Cola', category: 'pub', price: 3.00, available: true, description: '0,3L Glas' },
-  { id: 15, name: 'Wasser', category: 'pub', price: 2.50, available: true, description: '0,5L Flasche' },
-  { id: 16, name: 'Pommes Frites', category: 'pub', price: 4.00, available: true, description: 'mit Ketchup oder Mayo' },
-  { id: 17, name: 'Nüsse', category: 'pub', price: 2.00, available: true, description: 'gesalzen' },
-  { id: 18, name: 'Brezel', category: 'pub', price: 1.50, available: true, description: 'frisch gebacken' },
-  { id: 19, name: 'Wein (rot/weiß)', category: 'pub', price: 5.50, available: true, description: '0,2L Glas' },
-  { id: 20, name: 'Aperol Spritz', category: 'pub', price: 6.50, available: true, description: 'Der Klassiker' },
+  { id: '1', name: 'Pizza Margherita', price: 12.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Basilikum', available: true },
+  { id: '2', name: 'Pizza Salami', price: 14.00, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Salami', available: true },
+  { id: '3', name: 'Bier 0.5L', price: 4.50, category: 'pub', description: 'Helles Bier vom Fass', available: true },
+  { id: '4', name: 'Wein 0.2L', price: 5.00, category: 'pub', description: 'Rotwein oder Weißwein', available: true },
+  { id: '5', name: 'Cola 0.3L', price: 3.50, category: 'pub', description: 'Eisgekühlte Cola', available: true },
+  { id: '6', name: 'Pizza Quattro Stagioni', price: 16.00, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Schinken, Pilze, Artischocken, Oliven', available: true },
+  { id: '7', name: 'Pizza Diavola', price: 15.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Salami, Peperoni', available: true },
+  { id: '8', name: 'Weißbier 0.5L', price: 5.00, category: 'pub', description: 'Bayerisches Weißbier', available: true },
+  { id: '9', name: 'Apfelsaft 0.3L', price: 3.00, category: 'pub', description: 'Frischer Apfelsaft', available: true },
+  { id: '10', name: 'Pizza Vegetariana', price: 13.50, category: 'pizzeria', description: 'Tomatensauce, Mozzarella, Paprika, Zucchini, Aubergine', available: true }
 ];
 let orders = [];
+let orderHistory = [];
 
 // Routes
 app.get('/api', (req, res) => {
@@ -90,24 +83,26 @@ app.put('/api/menu/:id', (req, res) => {
 
 app.post('/api/orders', (req, res) => {
   const { tableNumber, items } = req.body;
-  if (!tableNumber || !items || items.length === 0) {
-    return res.status(400).json({ success: false, message: 'Tischnummer und Artikel sind erforderlich' });
-  }
-  const newOrder = {
-    id: uuidv4(),
-    tableNumber,
-    items,
-    status: 'pending',
-    createdAt: new Date()
-  };
-  orders.push(newOrder);
   
-  // Send back a success response in the format the frontend expects
-  res.status(201).json({ 
-    success: true, 
-    message: `Ihre Bestellung für Tisch ${tableNumber} wurde erfolgreich aufgenommen!`,
-    order: newOrder 
-  });
+  if (!tableNumber || !items || items.length === 0) {
+    return res.status(400).json({ error: 'Tischnummer und Bestellpositionen sind erforderlich' });
+  }
+  
+  const order = {
+    id: Date.now().toString(),
+    tableNumber,
+    items: items.map(item => ({
+      ...item,
+      category: menu.find(m => m.id === item.menuItemId)?.category || 'pub'
+    })),
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    pubStatus: 'pending',
+    pizzeriaStatus: 'pending'
+  };
+  
+  orders.push(order);
+  res.json({ success: true, orderId: order.id });
 });
 
 app.get('/api/orders', (req, res) => {
@@ -118,36 +113,83 @@ app.get('/api/orders', (req, res) => {
 
   const pendingOrders = orders.filter(order => order.status === 'pending');
 
-  const filteredOrders = pendingOrders.map(order => {
-    const itemsForCategory = order.items.filter(item => {
+  // Return full orders that contain at least one item for the requested category
+  const filteredOrders = pendingOrders.filter(order => 
+    order.items.some(item => {
       const menuItem = menu.find(mi => mi.id === item.id);
       return menuItem && menuItem.category === category;
-    });
-    
-    return {
-      ...order,
-      items: itemsForCategory
-    };
-  }).filter(order => order.items.length > 0);
+    })
+  );
 
   res.json(filteredOrders);
 });
 
-app.put('/api/orders/:id', (req, res) => {
+app.put('/api/orders/:id/section-status', (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
-  const orderIndex = orders.findIndex(o => o.id === id);
-
-  if (orderIndex === -1) {
+  const { section, status } = req.body; // section: 'pub' or 'pizzeria', status: 'ready' or 'delivered'
+  
+  const order = orders.find(o => o.id === id);
+  if (!order) {
     return res.status(404).json({ error: 'Bestellung nicht gefunden' });
   }
-
-  if (!['completed', 'cancelled'].includes(status)) {
-    return res.status(400).json({ error: 'Ungültiger Status' });
+  
+  if (section === 'pub') {
+    order.pubStatus = status;
+  } else if (section === 'pizzeria') {
+    order.pizzeriaStatus = status;
   }
+  
+  // Check if both sections are delivered, then mark as completed
+  if (order.pubStatus === 'delivered' && order.pizzeriaStatus === 'delivered') {
+    order.status = 'completed';
+    order.deliveredAt = new Date().toISOString();
+    
+    // Move to history
+    orderHistory.push({
+      id: order.id,
+      tableNumber: order.tableNumber,
+      items: order.items,
+      status: 'completed',
+      createdAt: order.createdAt,
+      deliveredAt: order.deliveredAt
+    });
+    
+    // Remove from active orders
+    orders = orders.filter(o => o.id !== id);
+  }
+  
+  res.json({ success: true, order });
+});
 
-  orders[orderIndex].status = status;
-  res.json(orders[orderIndex]);
+app.put('/api/orders/:id/cancel', (req, res) => {
+  const { id } = req.params;
+  
+  const order = orders.find(o => o.id === id);
+  if (!order) {
+    return res.status(404).json({ error: 'Bestellung nicht gefunden' });
+  }
+  
+  order.status = 'cancelled';
+  order.cancelledAt = new Date().toISOString();
+  
+  // Move to history
+  orderHistory.push({
+    id: order.id,
+    tableNumber: order.tableNumber,
+    items: order.items,
+    status: 'cancelled',
+    createdAt: order.createdAt,
+    cancelledAt: order.cancelledAt
+  });
+  
+  // Remove from active orders
+  orders = orders.filter(o => o.id !== id);
+  
+  res.json({ success: true });
+});
+
+app.get('/api/orders/history', (req, res) => {
+  res.json(orderHistory);
 });
 
 // The "catchall" handler: for any request that doesn't
