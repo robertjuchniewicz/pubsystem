@@ -167,12 +167,14 @@ app.get('/api/orders', (req, res) => {
 
 app.put('/api/orders/:id/section-status', async (req, res) => {
   const { id } = req.params;
-  const { section, status } = req.body; // section: 'pub' or 'pizzeria', status: 'ready' or 'delivered'
+  const { section, status } = req.body;
   
-  const order = orders.find(o => o.id === id);
-  if (!order) {
+  const orderIndex = orders.findIndex(o => o.id === id);
+  if (orderIndex === -1) {
     return res.status(404).json({ error: 'Bestellung nicht gefunden' });
   }
+
+  const order = orders[orderIndex];
   
   if (section === 'pub') {
     order.pubStatus = status;
@@ -180,26 +182,32 @@ app.put('/api/orders/:id/section-status', async (req, res) => {
     order.pizzeriaStatus = status;
   }
   
-  const hasPubItems = order.items.some(item => item.category === 'pub');
-  const hasPizzeriaItems = order.items.some(item => item.category === 'pizzeria');
-
-  const pubReady = !hasPubItems || order.pubStatus === 'delivered';
-  const pizzeriaReady = !hasPizzeriaItems || order.pizzeriaStatus === 'delivered';
-  
-  if (pubReady && pizzeriaReady) {
-    order.status = 'completed';
-    order.deliveredAt = new Date().toISOString();
-    
-    orderHistory.push(order);
-    orders = orders.filter(o => o.id !== id);
-
-    await writeFile(ORDERS_FILE, orders);
-    await writeFile(HISTORY_FILE, orderHistory);
-  } else {
-    await writeFile(ORDERS_FILE, orders);
-  }
+  // Zapisz zaktualizowane zamówienie, ale nie archiwizuj go automatycznie
+  await writeFile(ORDERS_FILE, orders);
   
   res.json({ success: true, order });
+});
+
+app.put('/api/orders/:id/archive', async (req, res) => {
+  const { id } = req.params;
+  const orderIndex = orders.findIndex(o => o.id === id);
+
+  if (orderIndex === -1) {
+    return res.status(404).json({ error: 'Bestellung nicht gefunden' });
+  }
+
+  const order = orders[orderIndex];
+  
+  order.status = 'completed';
+  order.deliveredAt = new Date().toISOString();
+    
+  orderHistory.push(order);
+  orders.splice(orderIndex, 1);
+
+  await writeFile(ORDERS_FILE, orders);
+  await writeFile(HISTORY_FILE, orderHistory);
+  
+  res.json({ success: true });
 });
 
 app.put('/api/orders/:id/cancel', (req, res) => {
@@ -233,10 +241,26 @@ app.get('/api/orders/history', (req, res) => {
   res.json(orderHistory);
 });
 
+app.get('/api/stats', (req, res) => {
+  const activeOrders = orders.filter(o => o.status === 'pending');
+  const uniqueTables = [...new Set(activeOrders.map(o => o.tableNumber))];
+
+  const availableItems = menu.filter(item => item.available).length;
+  const categories = [...new Set(menu.map(item => item.category))].length;
+
+  res.json({
+    activeOrders: activeOrders.length,
+    activeTables: uniqueTables.length,
+    availableItems,
+    categories,
+  });
+});
+
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+  const clientBuildPath = path.join(__dirname, '../client/build/index.html');
+  res.sendFile(clientBuildPath);
 });
 
 initializeData().then(() => {

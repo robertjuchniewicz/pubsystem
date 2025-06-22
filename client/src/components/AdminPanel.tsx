@@ -125,42 +125,33 @@ const AdminPanel: React.FC = () => {
 
   return (
     <div className="admin-panel">
-      <h1>Menüverwaltung</h1>
-
-      <button onClick={() => setShowAddForm(!showAddForm)} className="add-new-btn">
-        {showAddForm ? 'Formular schließen' : 'Neuen Artikel hinzufügen'}
-      </button>
-
-      {showAddForm && (
-        <form onSubmit={handleAddNewItem} className="add-item-form">
-          <h3>Neuen Artikel hinzufügen</h3>
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={newItem.name}
-            onChange={handleNewItemChange}
-          />
-          <input
-            type="number"
-            name="price"
-            placeholder="Preis"
-            value={newItem.price}
-            onChange={handleNewItemChange}
-          />
-          <select name="category" value={newItem.category} onChange={handleNewItemChange}>
-            <option value="pub">PUB</option>
-            <option value="pizzeria">Pizzeria</option>
-          </select>
-          <textarea
-            name="description"
-            placeholder="Beschreibung"
-            value={newItem.description}
-            onChange={handleNewItemChange}
-          />
-          <button type="submit">Hinzufügen</button>
-        </form>
-      )}
+      <div className="admin-controls">
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={newItem.name}
+          onChange={handleNewItemChange}
+        />
+        <input
+          type="number"
+          name="price"
+          placeholder="Preis"
+          value={newItem.price}
+          onChange={handleNewItemChange}
+        />
+        <select name="category" value={newItem.category} onChange={handleNewItemChange}>
+          <option value="pub">PUB</option>
+          <option value="pizzeria">Pizzeria</option>
+        </select>
+        <textarea
+          name="description"
+          placeholder="Beschreibung"
+          value={newItem.description}
+          onChange={handleNewItemChange}
+        />
+        <button onClick={handleAddNewItem}>Hinzufügen</button>
+      </div>
 
       <div className="menu-list">
         {menuItems.map(item => (

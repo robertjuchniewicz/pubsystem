@@ -46,6 +46,18 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
     }
   };
 
+  const archiveOrder = async (orderId: string) => {
+    try {
+      await fetch(`/api/orders/${orderId}/archive`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      fetchOrders();
+    } catch (error) {
+      console.error('Fehler beim Archivieren der Bestellung:', error);
+    }
+  };
+
   const cancelOrder = async (orderId: string) => {
     if (window.confirm('Möchten Sie diese Bestellung wirklich stornieren?')) {
       try {
@@ -100,6 +112,12 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
             const pubItems = order.items.filter(item => item.category === 'pub');
             const currentSectionStatus = category === 'pub' ? order.pubStatus : order.pizzeriaStatus;
             const otherSectionStatus = category === 'pub' ? order.pizzeriaStatus : order.pubStatus;
+
+            const hasPubItems = pubItems.length > 0;
+            const hasPizzeriaItems = pizzeriaItems.length > 0;
+            const isPubDelivered = !hasPubItems || order.pubStatus === 'delivered';
+            const isPizzeriaDelivered = !hasPizzeriaItems || order.pizzeriaStatus === 'delivered';
+            const isFullyDelivered = isPubDelivered && isPizzeriaDelivered;
 
             return (
               <div key={order.id} className="order-card">
@@ -183,12 +201,23 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
                     </button>
                   )}
                   
-                  <button 
-                    onClick={() => cancelOrder(order.id)} 
-                    className="action-btn cancel-btn"
-                  >
-                    Stornieren
-                  </button>
+                  {isFullyDelivered && (
+                    <button 
+                      onClick={() => archiveOrder(order.id)} 
+                      className="action-btn archive-btn"
+                    >
+                      Ausblenden
+                    </button>
+                  )}
+                  
+                  {!isFullyDelivered && (
+                    <button 
+                      onClick={() => cancelOrder(order.id)} 
+                      className="action-btn cancel-btn"
+                    >
+                      Stornieren
+                    </button>
+                  )}
                 </div>
               </div>
             );

@@ -8,6 +8,7 @@ const QRLabelGenerator: React.FC = () => {
   const [logo, setLogo] = useState<string | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [pages, setPages] = useState<JSX.Element[][]>([]);
+  const [tableCount, setTableCount] = useState(20);
 
   const generateQRCode = useCallback(async (canvasId: string, url: string) => {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -96,14 +97,9 @@ const QRLabelGenerator: React.FC = () => {
   };
 
   return (
-    <div className="qr-label-generator">
-      <div className="qr-label-header">
-        <h1>QR-Code-Tischschild Generator</h1>
-        <p>Generieren Sie druckfertige QR-Code-Tischschilder für Ihre Tische (4 pro A4-Seite)</p>
-      </div>
-
-      <div className="qr-label-controls">
-        <div className="form-row">
+    <div className="qr-generator-container">
+      <div className="qr-controls">
+        <div className="control-group">
           <div>
             <label>Von Tisch:</label>
             <input
@@ -124,7 +120,7 @@ const QRLabelGenerator: React.FC = () => {
           </div>
         </div>
 
-        <div className="form-row">
+        <div className="control-group">
           <div>
             <label>Logo hochladen:</label>
             <input type="file" accept="image/*" onChange={handleLogoUpload} />
@@ -135,7 +131,7 @@ const QRLabelGenerator: React.FC = () => {
           </div>
         </div>
         
-        <div className="form-row-full-width">
+        <div className="control-group">
           <label>Basis-URL:</label>
           <input
             type="text"
