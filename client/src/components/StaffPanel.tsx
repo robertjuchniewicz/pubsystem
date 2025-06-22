@@ -13,10 +13,13 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
       const data: Order[] = await response.json();
       
       setOrders(prevOrders => {
-        if (data.length > prevOrders.length && soundEnabled) {
-          playSound();
+        if (JSON.stringify(prevOrders) !== JSON.stringify(data)) {
+          if (data.length > prevOrders.length && soundEnabled) {
+            new Audio('/notification.mp3').play().catch(e => console.error("Konnte Audio nicht abspielen:", e));
+          }
+          return data;
         }
-        return data;
+        return prevOrders;
       });
     } catch (error) {
       console.error('Fehler beim Laden der Bestellungen:', error);
@@ -31,10 +34,6 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
     return () => clearInterval(interval);
   }, [fetchOrders]);
 
-  const playSound = () => {
-    new Audio('/notification.mp3').play().catch(e => console.error("Konnte Audio nicht abspielen:", e));
-  };
-
   const updateSectionStatus = async (orderId: string, status: 'ready' | 'delivered') => {
     try {
       await fetch(`/api/orders/${orderId}/section-status`, {
@@ -42,7 +41,7 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section: category, status }),
       });
-      fetchOrders(); // Immediately refetch to update the UI
+      fetchOrders();
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Bestellung:', error);
     }
@@ -78,7 +77,7 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
     switch (status) {
       case 'ready': return '#ffa500';
       case 'delivered': return '#4CAF50';
-      default: return '#ff9800';
+      default: return '#777';
     }
   };
 
@@ -113,7 +112,6 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
             const pizzeriaItems = order.items.filter(item => item.category === 'pizzeria');
             const pubItems = order.items.filter(item => item.category === 'pub');
             const currentSectionStatus = category === 'pub' ? order.pubStatus : order.pizzeriaStatus;
-            const otherSectionStatus = category === 'pub' ? order.pizzeriaStatus : order.pubStatus;
 
             const hasPubItems = pubItems.length > 0;
             const hasPizzeriaItems = pizzeriaItems.length > 0;
@@ -135,14 +133,12 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
                     <div className={`order-category-section ${category === 'pub' ? 'secondary' : ''}`}>
                       <div className="section-header">
                         <h4>Von der Pizzeria:</h4>
-                        {category === 'pizzeria' && (
                           <span 
                             className="status-badge"
                             style={{ backgroundColor: getStatusColor(order.pizzeriaStatus) }}
                           >
                             {getStatusText(order.pizzeriaStatus)}
                           </span>
-                        )}
                       </div>
                       <ul>
                         {pizzeriaItems.map((item, index) => (
@@ -156,14 +152,12 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
                     <div className={`order-category-section ${category === 'pizzeria' ? 'secondary' : ''}`}>
                       <div className="section-header">
                         <h4>Vom Pub:</h4>
-                        {category === 'pub' && (
                           <span 
                             className="status-badge"
                             style={{ backgroundColor: getStatusColor(order.pubStatus) }}
                           >
                             {getStatusText(order.pubStatus)}
                           </span>
-                        )}
                       </div>
                       <ul>
                         {pubItems.map((item, index) => (
@@ -183,7 +177,6 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
                       Bereit
                     </button>
                   )}
-                  
                   {currentSectionStatus === 'ready' && (
                     <button 
                       onClick={() => updateSectionStatus(order.id, 'delivered')} 
@@ -192,26 +185,14 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
                       Ausgeliefert
                     </button>
                   )}
-                  
-                  {currentSectionStatus === 'delivered' && otherSectionStatus === 'delivered' && (
-                    <button 
-                      onClick={() => updateSectionStatus(order.id, 'delivered')} 
-                      className="action-btn complete-btn"
-                      disabled
-                    >
-                      Vollständig ausgeliefert
-                    </button>
-                  )}
-                  
                   {isFullyDelivered && (
-                    <button 
+                     <button 
                       onClick={() => archiveOrder(order.id)} 
                       className="action-btn archive-btn"
                     >
                       Ausblenden
                     </button>
                   )}
-                  
                   {!isFullyDelivered && (
                     <button 
                       onClick={() => cancelOrder(order.id)} 
