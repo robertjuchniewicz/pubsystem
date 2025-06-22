@@ -12,16 +12,18 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
       if (!response.ok) throw new Error('Network response was not ok');
       const data: Order[] = await response.json();
       
-      if (data.length > orders.length && soundEnabled) {
-        playSound();
-      }
-      setOrders(data);
+      setOrders(prevOrders => {
+        if (data.length > prevOrders.length && soundEnabled) {
+          playSound();
+        }
+        return data;
+      });
     } catch (error) {
       console.error('Fehler beim Laden der Bestellungen:', error);
     } finally {
       setLoading(false);
     }
-  }, [category, orders, soundEnabled]);
+  }, [category, soundEnabled]);
 
   useEffect(() => {
     fetchOrders();
