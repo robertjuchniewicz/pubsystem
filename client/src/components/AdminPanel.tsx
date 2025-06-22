@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MenuItem } from '../types';
 
 interface AdminPanelProps {
@@ -6,178 +6,297 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = () => {
-  const [menu, setMenu] = useState<MenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [newItem, setNewItem] = useState({
+    id: '',
+    name: '',
+    description: '',
+    price: 0,
+    category: 'pub',
+    available: true
+  });
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-  const [isNewItem, setIsNewItem] = useState(false);
-
-  const fetchMenu = useCallback(async () => {
-    try {
-      const response = await fetch('/api/menu/all');
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
-      setMenu(data);
-    } catch (error) {
-      console.error('Fehler beim Laden des Menüs:', error);
-    }
-  }, []);
 
   useEffect(() => {
-    fetchMenu();
-  }, [fetchMenu]);
+    fetchMenuItems();
+  }, []);
 
-  const handleEdit = (item: MenuItem) => {
-    setEditingItem({ ...item });
-    setIsNewItem(false);
-  };
-
-  const handleAddNew = () => {
-    setEditingItem({
-      id: 0,
-      name: '',
-      price: 0,
-      category: 'pizzeria',
-      description: '',
-      available: true,
-    });
-    setIsNewItem(true);
-  };
-
-  const handleCancel = () => {
-    setEditingItem(null);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    if (!editingItem) return;
-    const { name, value, type } = e.target;
-  
-    let finalValue: string | number | boolean = value;
-  
-    if (type === 'number') {
-      finalValue = parseFloat(value);
-    } else if (type === 'checkbox') {
-      finalValue = (e.target as HTMLInputElement).checked;
+  const fetchMenuItems = async () => {
+    try {
+      const response = await fetch('/api/menu');
+      const data = await response.json();
+      setMenuItems(data);
+    } catch (error) {
+      console.error('Fehler beim Laden der Menüpunkte:', error);
     }
-  
-    setEditingItem({
-      ...editingItem,
-      [name]: finalValue,
-    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingItem) return;
-
-    const url = isNewItem ? '/api/menu' : `/api/menu/${editingItem.id}`;
-    const method = isNewItem ? 'POST' : 'PUT';
-
     try {
+      const url = editingItem ? `/api/menu/${editingItem.id}` : '/api/menu';
+      const method = editingItem ? 'PUT' : 'POST';
+      
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingItem),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newItem),
       });
 
       if (response.ok) {
+        setNewItem({
+          id: '',
+          name: '',
+          description: '',
+          price: 0,
+          category: 'pub',
+          available: true
+        });
         setEditingItem(null);
-        fetchMenu();
-      } else {
-        const errorData = await response.json();
-        alert(`Fehler: ${errorData.error}`);
+        fetchMenuItems();
       }
     } catch (error) {
-      console.error('Fehler beim Speichern des Produkts:', error);
-      alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+      console.error('Fehler beim Speichern:', error);
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Möchten Sie dieses Produkt wirklich löschen?')) {
+  const handleEdit = (item: MenuItem) => {
+    setEditingItem(item);
+    setNewItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      category: item.category,
+      available: item.available
+    });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Sind Sie sicher, dass Sie diesen Menüpunkt löschen möchten?')) {
       try {
-        const response = await fetch(`/api/menu/${id}`, { method: 'DELETE' });
+        const response = await fetch(`/api/menu/${id}`, {
+          method: 'DELETE',
+        });
         if (response.ok) {
-          fetchMenu();
-        } else {
-          alert('Fehler beim Löschen des Produkts.');
+          fetchMenuItems();
         }
       } catch (error) {
-        console.error('Fehler beim Löschen des Produkts:', error);
-        alert('Ein Fehler ist aufgetreten.');
+        console.error('Fehler beim Löschen:', error);
       }
+    }
+  };
+
+  const handleToggleAvailability = async (item: MenuItem) => {
+    try {
+      const response = await fetch(`/api/menu/${item.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...item,
+          available: !item.available
+        }),
+      });
+      if (response.ok) {
+        fetchMenuItems();
+      }
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Verfügbarkeit:', error);
     }
   };
 
   return (
-    <div className="admin-panel">
-      <div className="admin-header">
-        <button onClick={handleAddNew} className="add-new-btn">
-          Neues Produkt hinzufügen
-        </button>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <h1 style={{ color: '#333', marginBottom: '30px' }}>Menü-Verwaltung</h1>
+      
+      {/* Formular für neue/zu bearbeitende Menüpunkte */}
+      <div style={{ 
+        backgroundColor: '#f5f5f5', 
+        padding: '20px', 
+        borderRadius: '8px', 
+        marginBottom: '30px' 
+      }}>
+        <h2 style={{ marginTop: 0, color: '#333' }}>
+          {editingItem ? 'Menüpunkt bearbeiten' : 'Neuen Menüpunkt hinzufügen'}
+        </h2>
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '15px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newItem.name}
+              onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+              required
+              style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+            />
+            <input
+              type="number"
+              placeholder="Preis (€)"
+              value={newItem.price}
+              onChange={(e) => setNewItem({...newItem, price: parseFloat(e.target.value)})}
+              required
+              step="0.01"
+              style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+            />
+          </div>
+          <textarea
+            placeholder="Beschreibung"
+            value={newItem.description}
+            onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+            required
+            rows={3}
+            style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <select
+              value={newItem.category}
+              onChange={(e) => setNewItem({...newItem, category: e.target.value})}
+              style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+            >
+              <option value="pub">Pub</option>
+              <option value="pizzeria">Pizzeria</option>
+            </select>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input
+                type="checkbox"
+                id="available"
+                checked={newItem.available}
+                onChange={(e) => setNewItem({...newItem, available: e.target.checked})}
+              />
+              <label htmlFor="available">Verfügbar</label>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              type="submit"
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              {editingItem ? 'Aktualisieren' : 'Hinzufügen'}
+            </button>
+            {editingItem && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingItem(null);
+                  setNewItem({
+                    id: '',
+                    name: '',
+                    description: '',
+                    price: 0,
+                    category: 'pub',
+                    available: true
+                  });
+                }}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Abbrechen
+              </button>
+            )}
+          </div>
+        </form>
       </div>
 
-      {editingItem && (
-        <div className="edit-modal-backdrop">
-          <div className="edit-modal">
-            <h2>{isNewItem ? 'Neues Produkt' : 'Produkt bearbeiten'}</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Name</label>
-                <input type="text" name="name" value={editingItem.name} onChange={handleChange} required />
+      {/* Liste der Menüpunkte */}
+      <div>
+        <h2 style={{ color: '#333', marginBottom: '20px' }}>Aktuelle Menüpunkte</h2>
+        <div style={{ display: 'grid', gap: '15px' }}>
+          {menuItems.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                padding: '15px',
+                backgroundColor: item.available ? 'white' : '#f8f9fa',
+                opacity: item.available ? 1 : 0.7
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ margin: '0 0 5px 0', color: '#333' }}>
+                    {item.name}
+                    <span style={{ 
+                      marginLeft: '10px', 
+                      padding: '2px 8px', 
+                      borderRadius: '12px', 
+                      fontSize: '12px',
+                      backgroundColor: item.category === 'pub' ? '#007bff' : '#28a745',
+                      color: 'white'
+                    }}>
+                      {item.category}
+                    </span>
+                  </h3>
+                  <p style={{ margin: '5px 0', color: '#666' }}>{item.description}</p>
+                  <p style={{ margin: '5px 0', fontWeight: 'bold', color: '#333' }}>
+                    €{item.price.toFixed(2)}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <button
+                    onClick={() => handleToggleAvailability(item)}
+                    style={{
+                      padding: '5px 10px',
+                      backgroundColor: item.available ? '#dc3545' : '#28a745',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    {item.available ? 'Nicht verfügbar' : 'Verfügbar'}
+                  </button>
+                  <button
+                    onClick={() => handleEdit(item)}
+                    style={{
+                      padding: '5px 10px',
+                      backgroundColor: '#ffc107',
+                      color: '#333',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    Bearbeiten
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    style={{
+                      padding: '5px 10px',
+                      backgroundColor: '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    Löschen
+                  </button>
+                </div>
               </div>
-              <div className="form-group">
-                <label>Preis</label>
-                <input type="number" name="price" value={editingItem.price} onChange={handleChange} step="0.01" required />
-              </div>
-              <div className="form-group">
-                <label>Kategorie</label>
-                <select name="category" value={editingItem.category} onChange={handleChange}>
-                  <option value="pizzeria">Pizzeria</option>
-                  <option value="pub">Pub</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Beschreibung</label>
-                <textarea name="description" value={editingItem.description} onChange={handleChange}></textarea>
-              </div>
-              <div className="form-group-checkbox">
-                <label>Verfügbar</label>
-                <input type="checkbox" name="available" checked={editingItem.available} onChange={handleChange} />
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="save-btn">{isNewItem ? 'Erstellen' : 'Speichern'}</button>
-                <button type="button" onClick={handleCancel} className="cancel-btn">Abbrechen</button>
-              </div>
-            </form>
-          </div>
+            </div>
+          ))}
         </div>
-      )}
-
-      <div className="menu-table-container">
-        <table className="menu-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Preis</th>
-              <th>Kategorie</th>
-              <th>Verfügbar</th>
-              <th>Aktionen</th>
-            </tr>
-          </thead>
-          <tbody>
-            {menu.map(item => (
-              <tr key={item.id} className={!item.available ? 'unavailable' : ''}>
-                <td>{item.name}</td>
-                <td>€{item.price.toFixed(2)}</td>
-                <td>{item.category}</td>
-                <td>{item.available ? 'Ja' : 'Nein'}</td>
-                <td>
-                  <button onClick={() => handleEdit(item)} className="action-btn edit">Bearbeiten</button>
-                  <button onClick={() => handleDelete(item.id)} className="action-btn delete">Löschen</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );
