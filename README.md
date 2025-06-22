@@ -2,6 +2,12 @@
 
 Ein vollständig funktionales Online-Bestellsystem für ein kombiniertes Gastronomiebetrieb bestehend aus einem PUB und einer Pizzeria.
 
+## 🚀 Live Demo
+
+**Aplikacja jest wdrożona na Railway:**
+- **URL:** [Dostępny po wdrożeniu na Railway]
+- **Status:** W trakcie wdrażania
+
 ## Features
 
 ### Kundeninterface
@@ -31,7 +37,7 @@ Ein vollständig funktionales Online-Bestellsystem für ein kombiniertes Gastron
 - Node.js (Version 14 oder höher)
 - npm oder yarn
 
-### Setup
+### Lokale Entwicklung
 
 1. **Repository klonen und Abhängigkeiten installieren:**
 ```bash
@@ -52,6 +58,24 @@ Dies startet sowohl den Backend-Server (Port 3001) als auch den Frontend-Entwick
 ```bash
 npm run build
 ```
+
+## 🚀 Wdrożenie na Railway
+
+Aplikacja jest skonfigurowana do automatycznego wdrożenia na Railway:
+
+1. **Przejdź na [railway.app](https://railway.app)**
+2. **Zaloguj się przez GitHub**
+3. **Kliknij "New Project"**
+4. **Wybierz "Deploy from GitHub repo"**
+5. **Wybierz to repozytorium**
+
+Railway automatycznie:
+- Wykryje konfigurację Node.js
+- Zbuduje aplikację React
+- Wdroży serwer Express
+- Wygeneruje publiczny URL
+
+Szczegółowe instrukcje: [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)
 
 ## Verwendung
 

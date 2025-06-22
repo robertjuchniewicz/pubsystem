@@ -3,9 +3,6 @@
 /client/node_modules
 /server/node_modules
 
-# Build folder
-/client/build
-
 # Environment variables
 .env
 .env.local
