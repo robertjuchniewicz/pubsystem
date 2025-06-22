@@ -93,7 +93,7 @@ const CustomerMenu: React.FC = () => {
       
       if (data.success) {
         setOrderSubmitted(true);
-        setOrderMessage(data.message);
+        setOrderMessage(data.message || `Ihre Bestellung für Tisch ${tableNumber} wurde erfolgreich aufgenommen!`);
         setCart([]);
       } else {
         alert('Fehler beim Aufgeben der Bestellung. Bitte versuchen Sie es erneut.');

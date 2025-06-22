@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Order, CartItem } from '../types';
+import { Order } from '../types';
 
 const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) => {
   const [orders, setOrders] = useState<Order[]>([]);
