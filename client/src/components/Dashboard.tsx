@@ -28,8 +28,8 @@ const Dashboard: React.FC = () => {
     },
     {
       id: 'qr',
-      title: 'QR Etykietki',
-      description: 'QR-Code Etykietki für Tische generieren',
+      title: 'QR-Code-Tischaufsteller',
+      description: 'QR-Code-Tischaufsteller für Tische generieren',
       icon: '📱',
       color: 'green',
       links: [
@@ -163,9 +163,9 @@ const Dashboard: React.FC = () => {
 
               {item.id === 'qr' && (
                 <div className="qr-preview">
-                  <h3>QR Etykietki Generator</h3>
+                  <h3>QR-Code-Tischaufsteller Generator</h3>
                   <div className="qr-info">
-                    <p>Generieren Sie QR-Code Etykietki für Ihre Tische im A6-Format.</p>
+                    <p>Generieren Sie QR-Code-Tischaufsteller für Ihre Tische im A6-Format.</p>
                     <ul>
                       <li>✓ Druckoptimiertes Layout</li>
                       <li>✓ Echte QR-Codes</li>
