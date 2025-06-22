@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { MenuItem } from '../types';
-import './AdminPanel.css';
 
-const AdminPanel: React.FC = () => {
+interface AdminPanelProps {
+  // Puste na razie, można dodać propsy w przyszłości
+}
+
+const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isNewItem, setIsNewItem] = useState(false);
