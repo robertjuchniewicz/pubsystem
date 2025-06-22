@@ -11,7 +11,7 @@
     "restartPolicyMaxRetries": 10,
     "environment": {
       "NODE_ENV": "production",
-      "CI": "false"
+      "CI": "true"
     }
   }
 } 

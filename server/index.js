@@ -75,7 +75,7 @@ app.get('/api/menu', (req, res) => {
   res.json(menu.filter(item => item.available));
 });
 
-app.get('/api/menu/admin', (req, res) => {
+app.get('/api/menu/all', (req, res) => {
   res.json(menu);
 });
 
@@ -159,116 +159,4 @@ app.get('/api/orders', (req, res) => {
     order.items.some(item => item.category === category)
   );
   
-  console.log(`Po filtracji, znaleziono ${filteredOrders.length} zamówień dla tej kategorii.`);
-  console.log('Wysyłane zamówienia:', JSON.stringify(filteredOrders, null, 2));
-
-  res.json(filteredOrders);
-});
-
-app.put('/api/orders/:id/section-status', async (req, res) => {
-  const { id } = req.params;
-  const { section, status } = req.body;
-  
-  const orderIndex = orders.findIndex(o => o.id === id);
-  if (orderIndex === -1) {
-    return res.status(404).json({ error: 'Bestellung nicht gefunden' });
-  }
-
-  const order = orders[orderIndex];
-  
-  if (section === 'pub') {
-    order.pubStatus = status;
-  } else if (section === 'pizzeria') {
-    order.pizzeriaStatus = status;
-  }
-  
-  // Zapisz zaktualizowane zamówienie, ale nie archiwizuj go automatycznie
-  await writeFile(ORDERS_FILE, orders);
-  
-  res.json({ success: true, order });
-});
-
-app.put('/api/orders/:id/archive', async (req, res) => {
-  const { id } = req.params;
-  const orderIndex = orders.findIndex(o => o.id === id);
-
-  if (orderIndex === -1) {
-    return res.status(404).json({ error: 'Bestellung nicht gefunden' });
-  }
-
-  const order = orders[orderIndex];
-  
-  order.status = 'completed';
-  order.deliveredAt = new Date().toISOString();
-    
-  orderHistory.push(order);
-  orders.splice(orderIndex, 1);
-
-  await writeFile(ORDERS_FILE, orders);
-  await writeFile(HISTORY_FILE, orderHistory);
-  
-  res.json({ success: true });
-});
-
-app.put('/api/orders/:id/cancel', (req, res) => {
-  const { id } = req.params;
-  
-  const order = orders.find(o => o.id === id);
-  if (!order) {
-    return res.status(404).json({ error: 'Bestellung nicht gefunden' });
-  }
-  
-  order.status = 'cancelled';
-  order.cancelledAt = new Date().toISOString();
-  
-  // Move to history
-  orderHistory.push({
-    id: order.id,
-    tableNumber: order.tableNumber,
-    items: order.items,
-    status: 'cancelled',
-    createdAt: order.createdAt,
-    cancelledAt: order.cancelledAt
-  });
-  
-  // Remove from active orders
-  orders = orders.filter(o => o.id !== id);
-  
-  res.json({ success: true });
-});
-
-app.get('/api/orders/history', (req, res) => {
-  res.json(orderHistory);
-});
-
-app.get('/api/stats', (req, res) => {
-  const activeOrders = orders.filter(o => o.status === 'pending');
-  const uniqueTables = [...new Set(activeOrders.map(o => o.tableNumber))];
-
-  const availableItems = menu.filter(item => item.available).length;
-  const categories = [...new Set(menu.map(item => item.category))].length;
-
-  res.json({
-    activeOrders: activeOrders.length,
-    activeTables: uniqueTables.length,
-    availableItems,
-    categories,
-  });
-});
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  const clientBuildPath = path.join(__dirname, '../client/build/index.html');
-  res.sendFile(clientBuildPath);
-});
-
-initializeData().then(() => {
-  app.listen(port, () => {
-    console.log(`Server läuft auf Port ${port}`);
-    console.log(`API verfügbar unter http://localhost:${port}/api`);
-  });
-}).catch(err => {
-  console.error("Błąd inicjalizacji serwera:", err);
-  process.exit(1);
-}); 
+  console.log(`Po filtracji, znaleziono ${filteredOrders.length} zamówień dla tej kategorii.`

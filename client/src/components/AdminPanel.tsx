@@ -1,210 +1,180 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { MenuItem } from '../types';
+import './AdminPanel.css';
 
 const AdminPanel: React.FC = () => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [menu, setMenu] = useState<MenuItem[]>([]);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newItem, setNewItem] = useState({
-    name: '',
-    price: '',
-    category: 'pub',
-    description: '',
-  });
+  const [isNewItem, setIsNewItem] = useState(false);
 
-  const fetchMenuItems = useCallback(async () => {
+  const fetchMenu = useCallback(async () => {
     try {
-      const response = await fetch('/api/menu/admin');
+      const response = await fetch('/api/menu/all'); // Fetch all items including unavailable
       if (!response.ok) throw new Error('Network response was not ok');
-      const data: MenuItem[] = await response.json();
-      setMenuItems(data);
+      const data = await response.json();
+      setMenu(data);
     } catch (error) {
       console.error('Fehler beim Laden des Menüs:', error);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchMenuItems();
-  }, [fetchMenuItems]);
+    fetchMenu();
+  }, [fetchMenu]);
 
   const handleEdit = (item: MenuItem) => {
     setEditingItem({ ...item });
+    setIsNewItem(false);
   };
 
-  const handleCancelEdit = () => {
+  const handleAddNew = () => {
+    setEditingItem({
+      id: 0,
+      name: '',
+      price: 0,
+      category: 'pizzeria',
+      description: '',
+      available: true,
+    });
+    setIsNewItem(true);
+  };
+
+  const handleCancel = () => {
     setEditingItem(null);
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     if (!editingItem) return;
-    const { name, value } = e.target;
-    setEditingItem({ ...editingItem, [name]: value });
+    const { name, value, type } = e.target;
+  
+    let finalValue: string | number | boolean = value;
+  
+    if (type === 'number') {
+      finalValue = parseFloat(value);
+    } else if (type === 'checkbox') {
+      finalValue = (e.target as HTMLInputElement).checked;
+    }
+  
+    setEditingItem({
+      ...editingItem,
+      [name]: finalValue,
+    });
   };
 
-  const handleNewItemChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setNewItem(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSaveChanges = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
 
+    const url = isNewItem ? '/api/menu' : `/api/menu/${editingItem.id}`;
+    const method = isNewItem ? 'POST' : 'PUT';
+
     try {
-      await fetch(`/api/menu/${editingItem.id}`, {
-        method: 'PUT',
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingItem),
       });
-      await fetchMenuItems();
-      setEditingItem(null);
+
+      if (response.ok) {
+        setEditingItem(null);
+        fetchMenu(); // Refresh menu
+      } else {
+        const errorData = await response.json();
+        alert(`Fehler: ${errorData.error}`);
+      }
     } catch (error) {
-      console.error('Fehler beim Speichern:', error);
-      alert('Fehler beim Speichern der Änderungen.');
+      console.error('Fehler beim Speichern des Produkts:', error);
+      alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
     }
   };
 
-  const handleAddNewItem = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newItem.name || !newItem.price) {
-      alert('Name and price are required.');
-      return;
-    }
-    try {
-      await fetch('/api/menu', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...newItem, id: Date.now() }), // Use a temporary ID
-      });
-      await fetchMenuItems();
-      setNewItem({ name: '', price: '', category: 'pub', description: '' });
-      setShowAddForm(false);
-    } catch (error) {
-      console.error('Fehler beim Hinzufügen:', error);
-      alert('Fehler beim Hinzufügen des neuen Artikels.');
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Möchten Sie dieses Produkt wirklich löschen?')) {
+      try {
+        const response = await fetch(`/api/menu/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+          fetchMenu(); // Refresh menu
+        } else {
+          alert('Fehler beim Löschen des Produkts.');
+        }
+      } catch (error) {
+        console.error('Fehler beim Löschen des Produkts:', error);
+        alert('Ein Fehler ist aufgetreten.');
+      }
     }
   };
-
-  const handleToggleAvailability = async (item: MenuItem) => {
-    const updatedItem = { ...item, available: !item.available };
-    try {
-      await fetch(`/api/menu/${item.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedItem),
-      });
-      await fetchMenuItems();
-    } catch (error) {
-      console.error('Error toggling availability:', error);
-    }
-  };
-
-  const handleDeleteItem = async (id: number) => {
-    if (!window.confirm('Sind Sie sicher, dass Sie diesen Menüpunkt löschen möchten?')) return;
-    try {
-      await fetch(`/api/menu/${id}`, {
-        method: 'DELETE',
-      });
-      await fetchMenuItems();
-    } catch (error) {
-      console.error('Error deleting item:', error);
-    }
-  };
-
-
-  if (loading) {
-    return <div>Lade Menü...</div>;
-  }
 
   return (
     <div className="admin-panel">
-      <div className="admin-controls">
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={newItem.name}
-          onChange={handleNewItemChange}
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Preis"
-          value={newItem.price}
-          onChange={handleNewItemChange}
-        />
-        <select name="category" value={newItem.category} onChange={handleNewItemChange}>
-          <option value="pub">PUB</option>
-          <option value="pizzeria">Pizzeria</option>
-        </select>
-        <textarea
-          name="description"
-          placeholder="Beschreibung"
-          value={newItem.description}
-          onChange={handleNewItemChange}
-        />
-        <button onClick={handleAddNewItem}>Hinzufügen</button>
+      <div className="admin-header">
+        <button onClick={handleAddNew} className="add-new-btn">
+          Neues Produkt hinzufügen
+        </button>
       </div>
 
-      <div className="menu-list">
-        {menuItems.map(item => (
-          <div key={item.id} className="menu-item-admin">
-            {editingItem && editingItem.id === item.id ? (
-              <form onSubmit={handleSaveChanges} className="edit-form">
-                <input
-                  type="text"
-                  name="name"
-                  value={editingItem.name}
-                  onChange={handleInputChange}
-                />
-                <input
-                  type="number"
-                  name="price"
-                  value={editingItem.price}
-                  onChange={handleInputChange}
-                />
-                <select name="category" value={editingItem.category} onChange={handleInputChange}>
-                    <option value="pub">PUB</option>
-                    <option value="pizzeria">Pizzeria</option>
+      {editingItem && (
+        <div className="edit-modal-backdrop">
+          <div className="edit-modal">
+            <h2>{isNewItem ? 'Neues Produkt' : 'Produkt bearbeiten'}</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Name</label>
+                <input type="text" name="name" value={editingItem.name} onChange={handleChange} required />
+              </div>
+              <div className="form-group">
+                <label>Preis</label>
+                <input type="number" name="price" value={editingItem.price} onChange={handleChange} step="0.01" required />
+              </div>
+              <div className="form-group">
+                <label>Kategorie</label>
+                <select name="category" value={editingItem.category} onChange={handleChange}>
+                  <option value="pizzeria">Pizzeria</option>
+                  <option value="pub">Pub</option>
                 </select>
-                <textarea
-                  name="description"
-                  value={editingItem.description}
-                  onChange={handleInputChange}
-                />
-                <div className="edit-actions">
-                  <button type="submit">Speichern</button>
-                  <button type="button" onClick={handleCancelEdit}>Abbrechen</button>
-                </div>
-              </form>
-            ) : (
-              <>
-                <div className="item-info">
-                  <strong>{item.name}</strong> - €{Number(item.price).toFixed(2)} ({item.category})
-                  <span className={item.available ? 'status-available' : 'status-hidden'}>
-                    {item.available ? 'Sichtbar' : 'Versteckt'}
-                  </span>
-                </div>
-                <div className="item-actions">
-                  <button onClick={() => handleEdit(item)}>Bearbeiten</button>
-                  <button onClick={() => handleToggleAvailability(item)}>
-                    {item.available ? 'Verstecken' : 'Anzeigen'}
-                  </button>
-                  <button onClick={() => handleDeleteItem(item.id)} className="delete-btn">
-                    Löschen
-                  </button>
-                </div>
-              </>
-            )}
+              </div>
+              <div className="form-group">
+                <label>Beschreibung</label>
+                <textarea name="description" value={editingItem.description} onChange={handleChange}></textarea>
+              </div>
+              <div className="form-group-checkbox">
+                <label>Verfügbar</label>
+                <input type="checkbox" name="available" checked={editingItem.available} onChange={handleChange} />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="save-btn">{isNewItem ? 'Erstellen' : 'Speichern'}</button>
+                <button type="button" onClick={handleCancel} className="cancel-btn">Abbrechen</button>
+              </div>
+            </form>
           </div>
-        ))}
+        </div>
+      )}
+
+      <div className="menu-table-container">
+        <table className="menu-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Preis</th>
+              <th>Kategorie</th>
+              <th>Verfügbar</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {menu.map(item => (
+              <tr key={item.id} className={!item.available ? 'unavailable' : ''}>
+                <td>{item.name}</td>
+                <td>€{item.price.toFixed(2)}</td>
+                <td>{item.category}</td>
+                <td>{item.available ? 'Ja' : 'Nein'}</td>
+                <td>
+                  <button onClick={() => handleEdit(item)} className="action-btn edit">Bearbeiten</button>
+                  <button onClick={() => handleDelete(item.id)} className="action-btn delete">Löschen</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
