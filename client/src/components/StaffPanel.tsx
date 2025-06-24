@@ -74,9 +74,9 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
       dayName: dayNames[date.getDay()],
       formattedDate,
       formattedTime: date.toLocaleTimeString('de-DE', {
-        hour: '2-digit', 
-        minute: '2-digit',
-        second: '2-digit'
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
       })
     };
   };

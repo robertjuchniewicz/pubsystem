@@ -156,29 +156,34 @@ const CustomerMenu: React.FC = () => {
   if (orderPlaced) {
     return (
       <div className="customer-menu-page">
-        <header className="menu-header">
-          <h1>Unsere Speisekarte</h1>
+        <header className="menu-header" style={{ textAlign: 'center' }}>
+          {settings && settings.logo && (
+            <img src={settings.logo} alt="Logo" style={{ maxHeight: '120px', margin: '0 auto 10px', display: 'block' }} />
+          )}
+          <h1 style={{ textAlign: 'center', margin: '0 auto 10px' }}>Speisekarte</h1>
           {tableNumber ? (
-            <p>Tisch {tableNumber}</p>
+            <p style={{ textAlign: 'center', fontWeight: 500, margin: 0 }}>Tisch {tableNumber}</p>
           ) : (
-            <p>Tisch Nr: {tableNumber}</p>
+            <p style={{ textAlign: 'center', fontWeight: 500, margin: 0 }}>Tisch Nr: {tableNumber}</p>
           )}
         </header>
 
         <div className="menu-content">
           {Object.entries(groupedMenu).map(([mealType, items]) => (
             <div key={mealType} className="meal-type-section">
-              <h2 className="meal-type-title">{mealType}</h2>
+              <h2 className="meal-type-title" style={{ textAlign: 'center', width: '100%' }}>{mealType}</h2>
               <div className="menu-items-grid">
                 {items.map(item => (
-                  <div key={item.id} className="menu-item-card">
+                  <div key={item.id} className="menu-item-card customer-tile">
                     <h3>{item.name}</h3>
                     <p className="item-description">{item.description}</p>
-                    <div className="price">CHF {item.price.toFixed(2)}</div>
-                    <div className="item-controls">
-                      <button onClick={() => removeFromCart(String(item.id))} className="quantity-btn">-</button>
-                      <span className="quantity-display">{getQuantity(String(item.id))}</span>
-                      <button onClick={() => addToCart(item)} className="quantity-btn">+</button>
+                    <div className="tile-bottom-row" style={{display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginTop: 'auto'}}>
+                      <div className="price">CHF {item.price.toFixed(2)}</div>
+                      <div className="item-controls">
+                        <button onClick={() => removeFromCart(String(item.id))} className="quantity-btn">-</button>
+                        <span className="quantity-display">{getQuantity(String(item.id))}</span>
+                        <button onClick={() => addToCart(item)} className="quantity-btn">+</button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -231,12 +236,15 @@ const CustomerMenu: React.FC = () => {
   if (settings && settings.pubClosed === true) {
     return (
       <div className="customer-menu-page">
-        <header className="menu-header">
-          <h1>Unsere Speisekarte</h1>
+        <header className="menu-header" style={{ textAlign: 'center' }}>
+          {settings && settings.logo && (
+            <img src={settings.logo} alt="Logo" style={{ maxHeight: '120px', margin: '0 auto 10px', display: 'block' }} />
+          )}
+          <h1 style={{ textAlign: 'center', margin: '0 auto 10px' }}>Speisekarte</h1>
           {tableNumber ? (
-            <p>Tisch {tableNumber}</p>
+            <p style={{ textAlign: 'center', fontWeight: 500, margin: 0 }}>Tisch {tableNumber}</p>
           ) : (
-            <p>Tisch Nr: {tableNumber}</p>
+            <p style={{ textAlign: 'center', fontWeight: 500, margin: 0 }}>Tisch Nr: {tableNumber}</p>
           )}
         </header>
         <div className="pub-closed-message" style={{textAlign: 'center', marginTop: '2rem', fontSize: '1.3rem', color: '#b22222'}}>
@@ -248,29 +256,34 @@ const CustomerMenu: React.FC = () => {
 
   return (
     <div className="customer-menu-page">
-      <header className="menu-header">
-        <h1>Unsere Speisekarte</h1>
+      <header className="menu-header" style={{ textAlign: 'center' }}>
+        {settings && settings.logo && (
+          <img src={settings.logo} alt="Logo" style={{ maxHeight: '120px', margin: '0 auto 10px', display: 'block' }} />
+        )}
+        <h1 style={{ textAlign: 'center', margin: '0 auto 10px' }}>Speisekarte</h1>
         {tableNumber ? (
-          <p>Tisch {tableNumber}</p>
+          <p style={{ textAlign: 'center', fontWeight: 500, margin: 0 }}>Tisch {tableNumber}</p>
         ) : (
-          <p>Tisch Nr: {tableNumber}</p>
+          <p style={{ textAlign: 'center', fontWeight: 500, margin: 0 }}>Tisch Nr: {tableNumber}</p>
         )}
       </header>
 
       <div className="menu-content">
         {Object.entries(groupedMenu).map(([mealType, items]) => (
           <div key={mealType} className="meal-type-section">
-            <h2 className="meal-type-title">{mealType}</h2>
+            <h2 className="meal-type-title" style={{ textAlign: 'center', width: '100%' }}>{mealType}</h2>
             <div className="menu-items-grid">
               {items.map(item => (
-                <div key={item.id} className="menu-item-card">
+                <div key={item.id} className="menu-item-card customer-tile">
                   <h3>{item.name}</h3>
                   <p className="item-description">{item.description}</p>
-                  <div className="price">CHF {item.price.toFixed(2)}</div>
-                  <div className="item-controls">
-                    <button onClick={() => removeFromCart(String(item.id))} className="quantity-btn">-</button>
-                    <span className="quantity-display">{getQuantity(String(item.id))}</span>
-                    <button onClick={() => addToCart(item)} className="quantity-btn">+</button>
+                  <div className="tile-bottom-row" style={{display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginTop: 'auto'}}>
+                    <div className="price">CHF {item.price.toFixed(2)}</div>
+                    <div className="item-controls">
+                      <button onClick={() => removeFromCart(String(item.id))} className="quantity-btn">-</button>
+                      <span className="quantity-display">{getQuantity(String(item.id))}</span>
+                      <button onClick={() => addToCart(item)} className="quantity-btn">+</button>
+                    </div>
                   </div>
                 </div>
               ))}
