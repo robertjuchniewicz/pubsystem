@@ -65,20 +65,20 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
   // Funkcja do formatowania daty i czasu
   const formatDateTime = (date: Date) => {
     const dayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const dayName = dayNames[date.getDay()];
     const formattedDate = date.toLocaleDateString('de-DE', { 
       day: '2-digit', 
       month: '2-digit',
       year: 'numeric'
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const formattedTime = date.toLocaleTimeString('de-DE', {
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    });
-    return { dayName, formattedDate, formattedTime };
+    return {
+      dayName: dayNames[date.getDay()],
+      formattedDate,
+      formattedTime: date.toLocaleTimeString('de-DE', {
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+      })
+    };
   };
 
   // Funkcja do sprawdzania czy zamówienie jest z dzisiejszego dnia
