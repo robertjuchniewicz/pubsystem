@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, Link } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface Stat {
   label: string;
@@ -7,7 +8,13 @@ interface Stat {
 }
 
 const DashboardLayout: React.FC = () => {
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const [stats, setStats] = useState<Stat[]>([]);
+  const { settings } = useSettings();
+
+  const handleLinkClick = () => {
+    setSidebarVisible(false);
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -31,42 +38,121 @@ const DashboardLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="layout-container">
+    <div className={`layout-container ${sidebarVisible ? 'sidebar-visible' : ''}`}>
+      <button 
+        className="mobile-menu-toggle" 
+        onClick={() => setSidebarVisible(!sidebarVisible)}
+      >
+        {sidebarVisible ? '✖' : '☰'}
+      </button>
+      
+      {/* Mobile Overlay */}
+      {sidebarVisible && (
+        <div 
+          className="sidebar-overlay active" 
+          onClick={() => setSidebarVisible(false)}
+        />
+      )}
+      
       <nav className="sidebar">
-        <h1 className="sidebar-title">Helvetia</h1>
-        <div className="sidebar-section">
-          <h2 className="section-title">Bestellungen</h2>
-          <Link to="/staff/pizzeria" className="sidebar-link external">Pizzeria-Ansicht</Link>
-          <Link to="/staff/pub" className="sidebar-link external">Pub-Ansicht</Link>
+        <div className="sidebar-header">
+          {settings.logo ? (
+            <img src={settings.logo} alt="Helvetia Logo" className="sidebar-logo" />
+          ) : (
+            <img src="/logos_combined_with_white_x.png" alt="Helvetia Logo" className="sidebar-logo" />
+          )}
         </div>
-        <div className="sidebar-section">
-          <h2 className="section-title">Verwaltung</h2>
-          <NavLink to="/admin" className="sidebar-link">
-            Menü verwalten
-          </NavLink>
-          <NavLink to="/qr-labels" className="sidebar-link">
-            QR-Code-Tischschilder
-          </NavLink>
-          <NavLink to="/history" className="sidebar-link">
-            Bestellhistorie
-          </NavLink>
+        
+        <div className="sidebar-menu">
+          <div className="menu-section">
+            <h3 className="menu-section-title">Bestellungen</h3>
+            <div className="menu-tiles">
+              <NavLink to="/waiter" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">🍽️</div>
+                <div className="tile-content">
+                  <h4>Kellner</h4>
+                  <p>Bestellung aufgeben</p>
+                </div>
+              </NavLink>
+              <NavLink to="/staff/pizzeria" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">🍕</div>
+                <div className="tile-content">
+                  <h4>Pizzeria</h4>
+                  <p>Küchen-Bestellungen</p>
+                </div>
+              </NavLink>
+              <NavLink to="/staff/pub" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">🍺</div>
+                <div className="tile-content">
+                  <h4>Pub</h4>
+                  <p>Bar-Bestellungen</p>
+                </div>
+              </NavLink>
+            </div>
+          </div>
+
+          <div className="menu-section">
+            <h3 className="menu-section-title">Verwaltung</h3>
+            <div className="menu-tiles">
+              <NavLink to="/speisekarte" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">📝</div>
+                <div className="tile-content">
+                  <h4>Speisekarte</h4>
+                  <p>Verwalten</p>
+                </div>
+              </NavLink>
+              <NavLink to="/history" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">📊</div>
+                <div className="tile-content">
+                  <h4>Historie</h4>
+                  <p>Bestellungen</p>
+                </div>
+              </NavLink>
+              <NavLink to="/settings" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">⚙️</div>
+                <div className="tile-content">
+                  <h4>Einstellungen</h4>
+                  <p>System verwalten</p>
+                </div>
+              </NavLink>
+            </div>
+          </div>
+
+          <div className="menu-section">
+            <h3 className="menu-section-title">Generatoren</h3>
+            <div className="menu-tiles">
+              <NavLink to="/qr-labels" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">📱</div>
+                <div className="tile-content">
+                  <h4>QR-Codes</h4>
+                  <p>Generieren</p>
+                </div>
+              </NavLink>
+              <NavLink to="/event-posters" className="menu-tile" onClick={handleLinkClick}>
+                <div className="tile-icon">🎨</div>
+                <div className="tile-content">
+                  <h4>Plakate</h4>
+                  <p>Veranstaltungen</p>
+                </div>
+              </NavLink>
+            </div>
+          </div>
         </div>
       </nav>
+      
       <main className="main-content">
-        <header className="main-header">
-          <h2>Dashboard</h2>
-          <p>Zentrales Kontrollzentrum für alle Funktionen</p>
-        </header>
-        <div className="stats-grid">
-          {stats.map((stat) => (
-            <div key={stat.label} className="stat-card">
-              <span className="stat-value">{stat.value}</span>
-              <span className="stat-label">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-        <div className="content-outlet">
-          <Outlet />
+        <div className="content-wrapper">
+          <div className="stats-grid">
+            {stats.map((stat) => (
+              <div key={stat.label} className="stat-card">
+                <span className="stat-value">{stat.value}</span>
+                <span className="stat-label">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="content-outlet">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>

@@ -15,7 +15,7 @@ Die Online-Bestellungsanwendung läuft erfolgreich auf Ihrem System.
 - Pizzeria Panel: http://localhost:3000/staff/pizzeria
 
 **Administration:**
-- Speisekarte verwalten: http://localhost:3000/admin
+- Speisekarte verwalten: http://localhost:3000/speisekarte
 - QR Etykietki Generator: http://localhost:3000/qr-labels
 
 ### So testen Sie die Anwendung:
@@ -32,7 +32,7 @@ Die Online-Bestellungsanwendung läuft erfolgreich auf Ihrem System.
    - Aktivieren Sie die Tonbenachrichtigungen
 
 3. **Speisekarte verwalten:**
-   - Öffnen Sie http://localhost:3000/admin
+   - Öffnen Sie http://localhost:3000/speisekarte
    - Bearbeiten Sie Preise und Beschreibungen
    - Verstecken Sie nicht verfügbare Artikel
    - Fügen Sie neue Menüpunkte hinzu
@@ -58,7 +58,7 @@ Die Online-Bestellungsanwendung läuft erfolgreich auf Ihrem System.
 - Optionale Tonbenachrichtigungen
 
 ✅ **Administration:**
-- Vollständige Speisekartenverwaltung
+- Speisekarte verwalten: http://localhost:3000/speisekarte
 - Preis- und Beschreibungsediting
 - Artikel verfügbar/verstecken
 - Neue Menüpunkte hinzufügen
@@ -83,7 +83,7 @@ Die Online-Bestellungsanwendung läuft erfolgreich auf Ihrem System.
 ### Neue API-Endpunkte:
 
 **Speisekartenverwaltung:**
-- `GET /api/menu/admin` - Alle Menüpunkte (inkl. versteckte)
+- `GET /api/menu/speisekarte` - Alle Menüpunkte (inkl. versteckte)
 - `POST /api/menu` - Neuen Menüpunkt hinzufügen
 - `PUT /api/menu/:id` - Menüpunkt bearbeiten
 - `DELETE /api/menu/:id` - Menüpunkt löschen
@@ -105,7 +105,7 @@ Die Online-Bestellungsanwendung läuft erfolgreich auf Ihrem System.
    - Aktualisieren Sie die QR-Codes entsprechend
 
 4. **Speisekarte anpassen:**
-   - Verwenden Sie das Admin-Panel unter `/admin`
+   - Verwenden Sie das Speisekarte-Panel unter `/speisekarte`
    - Oder bearbeiten Sie `server/index.js` für neue Artikel
 
 5. **QR Etykietki drucken:**

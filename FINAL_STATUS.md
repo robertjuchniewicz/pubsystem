@@ -15,8 +15,8 @@
 - **Status:** DZIAŁA
 - **Funkcje:** Wszystkie funkcjonalności w jednym miejscu
 
-### **2. Panel Administracyjny** ✅
-- **Link:** http://localhost:3000/admin
+### **2. Speisekarte Panel** ✅
+- **Link:** http://localhost:3000/speisekarte
 - **Status:** DZIAŁA
 - **Funkcje:** Edycja cen, ukrywanie pozycji, dodawanie nowych
 
@@ -60,7 +60,7 @@
 
 ### **API Endpoints:**
 - ✅ `GET /api/menu` - Menu dla klientów
-- ✅ `GET /api/menu/admin` - Menu dla admina
+- ✅ `GET /api/menu/speisekarte` - Menu dla speisekarte
 - ✅ `POST /api/menu` - Dodawanie pozycji
 - ✅ `PUT /api/menu/:id` - Edycja pozycji
 - ✅ `DELETE /api/menu/:id` - Usuwanie pozycji
@@ -69,7 +69,7 @@
 
 ### **Frontend:**
 - ✅ Dashboard - główna strona
-- ✅ Admin Panel - zarządzanie menu
+- ✅ Speisekarte Panel - zarządzanie menu
 - ✅ Staff Panels - zarządzanie zamówieniami
 - ✅ QR Generator - etykiety
 - ✅ Customer Menu - zamówienia klientów
@@ -89,7 +89,7 @@
 3. **Złóż zamówienie** - automatycznie trafia do odpowiednich paneli
 
 ### **Dla administracji:**
-1. **Edytuj menu** w Admin Panel
+1. **Edytuj menu** w Speisekarte Panel
 2. **Drukuj etykiety** w QR Generator
 3. **Monitoruj zamówienia** w Staff Panels
 
@@ -103,7 +103,7 @@
 3. Skonfiguruj HTTPS
 
 ### **Rozszerzenia:**
-1. Dodaj autentykację dla admina
+1. Dodaj autentykację dla speisekarte
 2. Dodaj statystyki zamówień
 3. Dodaj system płatności
 
@@ -113,7 +113,7 @@
 
 **Wszystkie żądane funkcjonalności zostały zaimplementowane i działają:**
 
-✅ **Panel administracyjny** - edycja cen, ukrywanie pozycji  
+✅ **Speisekarte Panel** - edycja cen, ukrywanie pozycji  
 ✅ **Generator etykietek QR** - format A6, druk  
 ✅ **Centralny dashboard** - wszystko w jednym miejscu  
 ✅ **Live zamówienia** - PUB i Pizzeria panele  

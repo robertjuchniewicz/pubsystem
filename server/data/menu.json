@@ -1,0 +1,353 @@
+[
+  {
+    "id": 1,
+    "name": "Grüner Salat",
+    "price": 8.5,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Frischer grüner Salat",
+    "available": true
+  },
+  {
+    "id": 2,
+    "name": "Gemischter Salat",
+    "price": 9.5,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Verschiedene Blattsalate",
+    "available": true
+  },
+  {
+    "id": 3,
+    "name": "Tomaten Salat",
+    "price": 10.5,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Mit frischen Tomaten",
+    "available": true
+  },
+  {
+    "id": 4,
+    "name": "Nüssler Salat mit Speckwürfeli, Ei & Croûtons",
+    "price": 12.5,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Herzhafter Nüssler Salat",
+    "available": true
+  },
+  {
+    "id": 5,
+    "name": "Tomatencrèmesuppe",
+    "price": 9,
+    "category": "pizzeria",
+    "mealType": "Suppen",
+    "description": "Cremige Tomatensuppe",
+    "available": true
+  },
+  {
+    "id": 6,
+    "name": "Pilzcrèmesuppe",
+    "price": 9,
+    "category": "pizzeria",
+    "mealType": "Suppen",
+    "description": "Cremige Pilzsuppe",
+    "available": true
+  },
+  {
+    "id": 7,
+    "name": "Tomaten-/Mozzarella Salat",
+    "price": 11.5,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Klassischer Tomaten-Mozzarella Salat",
+    "available": true
+  },
+  {
+    "id": 8,
+    "name": "Salat Teller",
+    "price": 14,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Großer Salatteller",
+    "available": true
+  },
+  {
+    "id": 9,
+    "name": "Thonsalat garniert",
+    "price": 13.5,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Thunfischsalat, schön garniert",
+    "available": true
+  },
+  {
+    "id": 10,
+    "name": "Cervelat Salat garniert",
+    "price": 13,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Wurstsalat, schön garniert",
+    "available": true
+  },
+  {
+    "id": 11,
+    "name": "Cervelat-/Käse Salat garniert",
+    "price": 14,
+    "category": "pizzeria",
+    "mealType": "Salate",
+    "description": "Wurst-Käse-Salat, schön garniert",
+    "available": true
+  },
+  {
+    "id": 12,
+    "name": "Gemüselasagne",
+    "price": 18,
+    "category": "pizzeria",
+    "mealType": "Pasta",
+    "description": "Hausgemachte Gemüselasagne",
+    "available": true
+  },
+  {
+    "id": 13,
+    "name": "Lasagne Bolognaise",
+    "price": 19.5,
+    "category": "pizzeria",
+    "mealType": "Pasta",
+    "description": "Klassische Lasagne Bolognaise",
+    "available": true
+  },
+  {
+    "id": 14,
+    "name": "Spaghetti Bolognaise",
+    "price": 17.5,
+    "category": "pizzeria",
+    "mealType": "Pasta",
+    "description": "Spaghetti mit Fleischsauce",
+    "available": true
+  },
+  {
+    "id": 15,
+    "name": "Spaghetti Carbonara",
+    "price": 18.5,
+    "category": "pizzeria",
+    "mealType": "Pasta",
+    "description": "Spaghetti mit Speck und Ei",
+    "available": true
+  },
+  {
+    "id": 16,
+    "name": "Spaghetti Napoli",
+    "price": 16,
+    "category": "pizzeria",
+    "mealType": "Pasta",
+    "description": "Spaghetti mit Tomatensauce",
+    "available": true
+  },
+  {
+    "id": 17,
+    "name": "Spaghetti Aglio & Olio",
+    "price": 16.5,
+    "category": "pizzeria",
+    "mealType": "Pasta",
+    "description": "Spaghetti mit Knoblauch und Öl",
+    "available": true
+  },
+  {
+    "id": 18,
+    "name": "Schweinssteak (180 gr) mit verschiedenen Salaten",
+    "price": 25,
+    "category": "pizzeria",
+    "mealType": "Hauptgerichte",
+    "description": "Saftiges Schweinssteak mit Salatbouquet",
+    "available": true
+  },
+  {
+    "id": 19,
+    "name": "Schweinsteak inkl. Pommes",
+    "price": 23,
+    "category": "pizzeria",
+    "mealType": "Hauptgerichte",
+    "description": "Schweinsteak mit einer Portion Pommes",
+    "available": true
+  },
+  {
+    "id": 20,
+    "name": "Pouletbrust mit verschiedenen Salaten",
+    "price": 24,
+    "category": "pizzeria",
+    "mealType": "Hauptgerichte",
+    "description": "Zarte Pouletbrust mit Salatbouquet",
+    "available": true
+  },
+  {
+    "id": 21,
+    "name": "Pouletbrust inkl. Pommes",
+    "price": 22,
+    "category": "pizzeria",
+    "mealType": "Hauptgerichte",
+    "description": "Pouletbrust mit einer Portion Pommes",
+    "available": true
+  },
+  {
+    "id": 22,
+    "name": "Portion Pommes",
+    "price": 7,
+    "category": "pizzeria",
+    "mealType": "Beilagen",
+    "description": "Knusprige Pommes Frites",
+    "available": true
+  },
+  {
+    "id": 23,
+    "name": "Margherita",
+    "price": 14,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Basilikum",
+    "available": true
+  },
+  {
+    "id": 24,
+    "name": "Funghi",
+    "price": 15,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Pilze",
+    "available": true
+  },
+  {
+    "id": 25,
+    "name": "Fiorentina",
+    "price": 16,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Spinat, Ei",
+    "available": true
+  },
+  {
+    "id": 26,
+    "name": "Napoli",
+    "price": 15.5,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Sardellen",
+    "available": true
+  },
+  {
+    "id": 27,
+    "name": "Quatro Stagioni",
+    "price": 18,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Schinken, Pilze, Artischocken, Oliven",
+    "available": true
+  },
+  {
+    "id": 28,
+    "name": "Etna",
+    "price": 17.5,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Scharfe Pizza",
+    "available": true
+  },
+  {
+    "id": 29,
+    "name": "Hawaii",
+    "price": 16.5,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Schinken, Ananas",
+    "available": true
+  },
+  {
+    "id": 30,
+    "name": "Frutti di Mare",
+    "price": 19,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Meeresfrüchte",
+    "available": true
+  },
+  {
+    "id": 31,
+    "name": "Al Tonno",
+    "price": 17,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Thunfisch",
+    "available": true
+  },
+  {
+    "id": 32,
+    "name": "Prosciutto",
+    "price": 16,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Schinken",
+    "available": true
+  },
+  {
+    "id": 33,
+    "name": "Prosciutto e funghi",
+    "price": 17,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Tomatensauce, Mozzarella, Schinken, Pilze",
+    "available": true
+  },
+  {
+    "id": 34,
+    "name": "Luigi",
+    "price": 18,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Spezialpizza Luigi",
+    "available": true
+  },
+  {
+    "id": 35,
+    "name": "Contadina",
+    "price": 17.5,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Bauernpizza",
+    "available": true
+  },
+  {
+    "id": 36,
+    "name": "Diti's Pizza",
+    "price": 20,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Hausgemachte Spezialpizza",
+    "available": true
+  },
+  {
+    "id": 37,
+    "name": "Chicken",
+    "price": 18.5,
+    "category": "pizzeria",
+    "mealType": "Pizza",
+    "description": "Pizza mit Poulet",
+    "available": true
+  },
+  {
+    "id": 38,
+    "name": "Rugen Brau 500ml",
+    "price": 5,
+    "category": "pub-trinken",
+    "description": "Helles bier",
+    "mealType": "Bier",
+    "available": true
+  },
+  {
+    "id": 39,
+    "name": "Sandwich Club",
+    "price": 8,
+    "category": "pub-essen",
+    "description": "Toast mit Käse und Gemüse",
+    "mealType": "Vorspeisen",
+    "available": true
+  }
+]

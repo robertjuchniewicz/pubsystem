@@ -15,5 +15,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Production build folder
-/client/build 
+# Production build folder - commented out for Railway deployment
+# /client/build 

@@ -1,38 +1,110 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Order } from '../types';
+import { useSettings } from '../contexts/SettingsContext';
 
 const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) => {
+  const { settings, updateSettings, loading: settingsLoading } = useSettings();
+  const [showPizzeriaMenu, setShowPizzeriaMenu] = useState<boolean>(true);
+  const [showPubEssen, setShowPubEssen] = useState<boolean>(true);
+  const [pubClosed, setPubClosed] = useState<boolean>(false);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [historyOrders, setHistoryOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const fetchOrders = useCallback(async () => {
     try {
-      const response = await fetch(`/api/orders?category=${category}`);
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data: Order[] = await response.json();
-      
-      setOrders(prevOrders => {
-        if (JSON.stringify(prevOrders) !== JSON.stringify(data)) {
-          if (data.length > prevOrders.length && soundEnabled) {
-            new Audio('/notification.mp3').play().catch(e => console.error("Konnte Audio nicht abspielen:", e));
-          }
-          return data;
-        }
-        return prevOrders;
-      });
+      const response = await fetch('/api/orders?category=pub');
+      const pubOrders = await response.json();
+      const pizzeriaResponse = await fetch('/api/orders?category=pizzeria');
+      const pizzeriaOrders = await pizzeriaResponse.json();
+      setOrders([...pubOrders, ...pizzeriaOrders]);
     } catch (error) {
       console.error('Fehler beim Laden der Bestellungen:', error);
+    }
+  }, []);
+
+  const fetchHistory = useCallback(async () => {
+    try {
+      const response = await fetch('/api/orders/history');
+      const historyData = await response.json();
+      setHistoryOrders(historyData);
+    } catch (error) {
+      console.error('Fehler beim Laden der Bestellhistorie:', error);
     } finally {
       setLoading(false);
     }
-  }, [category, soundEnabled]);
+  }, []);
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 5000);
+    fetchHistory();
+    const interval = setInterval(() => {
+      fetchOrders();
+      fetchHistory();
+    }, 5000);
     return () => clearInterval(interval);
-  }, [fetchOrders]);
+  }, [fetchOrders, fetchHistory]);
+
+  useEffect(() => {
+    if (settings) {
+      setShowPizzeriaMenu(settings.pizzeriaMenuEnabled ?? true);
+      setShowPubEssen(settings.pubEssenEnabled ?? true);
+      setPubClosed(settings.pubClosed ?? false);
+    }
+  }, [settings]);
+
+  // Aktualizuj czas co sekundę
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Funkcja do formatowania daty i czasu
+  const formatDateTime = (date: Date) => {
+    const dayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const dayName = dayNames[date.getDay()];
+    const formattedDate = date.toLocaleDateString('de-DE', { 
+      day: '2-digit', 
+      month: '2-digit',
+      year: 'numeric'
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const formattedTime = date.toLocaleTimeString('de-DE', {
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    return { dayName, formattedDate, formattedTime };
+  };
+
+  // Funkcja do sprawdzania czy zamówienie jest z dzisiejszego dnia
+  const isToday = (dateString: string) => {
+    const orderDate = new Date(dateString);
+    const today = new Date();
+    return orderDate.toDateString() === today.toDateString();
+  };
+
+  const formatTimeElapsed = (createdAt: string) => {
+    const now = new Date();
+    const created = new Date(createdAt);
+    const diffInSeconds = Math.floor((now.getTime() - created.getTime()) / 1000);
+    
+    const hours = Math.floor(diffInSeconds / 3600);
+    const minutes = Math.floor((diffInSeconds % 3600) / 60);
+    const seconds = diffInSeconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${seconds}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    } else {
+      return `${seconds}s`;
+    }
+  };
 
   const updateSectionStatus = async (orderId: string, status: 'ready' | 'delivered') => {
     try {
@@ -73,6 +145,53 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
     }
   };
 
+  const archiveAllDelivered = async () => {
+    if (window.confirm('Möchten Sie wirklich alle vollständig ausgelieferten Bestellungen archivieren?')) {
+      try {
+        const response = await fetch('/api/orders/archive-delivered', {
+          method: 'POST',
+        });
+        const result = await response.json();
+        alert(result.message);
+        fetchOrders();
+      } catch (error) {
+        console.error('Fehler beim Archivieren aller Bestellungen:', error);
+        alert('Ein Fehler ist aufgetreten.');
+      }
+    }
+  };
+
+  const handlePubClosedToggle = async () => {
+    const newStatus = !pubClosed;
+    setPubClosed(newStatus);
+    
+    if (newStatus) {
+      // When PUB is closed, automatically close everything
+      setShowPizzeriaMenu(false);
+      setShowPubEssen(false);
+      await updateSettings({ 
+        pubClosed: true, 
+        pizzeriaMenuEnabled: false, 
+        pubEssenEnabled: false 
+      });
+    } else {
+      // When PUB is opened, keep current settings
+      await updateSettings({ pubClosed: false });
+    }
+  };
+
+  const handlePizzeriaMenuToggle = async () => {
+    const newStatus = !showPizzeriaMenu;
+    setShowPizzeriaMenu(newStatus);
+    await updateSettings({ pizzeriaMenuEnabled: newStatus });
+  };
+
+  const handlePubEssenToggle = async () => {
+    const newStatus = !showPubEssen;
+    setShowPubEssen(newStatus);
+    await updateSettings({ pubEssenEnabled: newStatus });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ready': return '#ffa500';
@@ -89,20 +208,154 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
     }
   };
 
+  const hasFullyDeliveredOrders = orders.some(order => {
+    const hasPubItems = order.items.some(item => item.category === 'pub-essen' || item.category === 'pub-trinken');
+    const hasPizzeriaItems = order.items.some(item => item.category === 'pizzeria');
+    const isPubDelivered = !hasPubItems || order.pubStatus === 'delivered';
+    const isPizzeriaDelivered = !hasPizzeriaItems || order.pizzeriaStatus === 'delivered';
+    return isPubDelivered && isPizzeriaDelivered;
+  });
+
+  // Funkcje do obliczania statystyk
+  const getOrderStats = () => {
+    // Łączymy aktywne zamówienia z historią i filtrujemy tylko dzisiejsze
+    const allOrders = [...orders, ...historyOrders].filter(order => isToday(order.createdAt));
+    
+    let relevantOrders = allOrders;
+    
+    // Dla Pizzeria pokazuj tylko zamówienia z pozycjami pizzerii
+    if (category === 'pizzeria') {
+      relevantOrders = allOrders.filter(order => 
+        order.items.some(item => item.category === 'pizzeria')
+      );
+    }
+    
+    const openOrders = relevantOrders.filter(order => {
+      const hasPubItems = order.items.some(item => item.category === 'pub-essen' || item.category === 'pub-trinken');
+      const hasPizzeriaItems = order.items.some(item => item.category === 'pizzeria');
+      const isPubDelivered = !hasPubItems || order.pubStatus === 'delivered';
+      const isPizzeriaDelivered = !hasPizzeriaItems || order.pizzeriaStatus === 'delivered';
+      return !(isPubDelivered && isPizzeriaDelivered);
+    });
+    
+    const completedOrders = relevantOrders.filter(order => {
+      const hasPubItems = order.items.some(item => item.category === 'pub-essen' || item.category === 'pub-trinken');
+      const hasPizzeriaItems = order.items.some(item => item.category === 'pizzeria');
+      const isPubDelivered = !hasPubItems || order.pubStatus === 'delivered';
+      const isPizzeriaDelivered = !hasPizzeriaItems || order.pizzeriaStatus === 'delivered';
+      return isPubDelivered && isPizzeriaDelivered;
+    });
+    
+    return {
+      total: relevantOrders.length,
+      open: openOrders.length,
+      completed: completedOrders.length
+    };
+  };
+
+  const stats = getOrderStats();
+
+  if (settingsLoading) {
+    return <div>Ładowanie ustawień...</div>;
+  }
+
   return (
     <div className={`staff-panel ${category}`}>
       <div className="staff-header">
         <h1>Bestellungen - {category === 'pub' ? 'PUB' : 'Pizzeria'}</h1>
-        <label className="sound-toggle">
-          <input
-            type="checkbox"
-            checked={soundEnabled}
-            onChange={() => setSoundEnabled(!soundEnabled)}
-          />
-          Ton bei neuen Bestellungen
-        </label>
+        {/* Zegar w prawym górnym rogu */}
+        <div className="live-clock">
+          <span className="clock-day">{formatDateTime(currentTime).dayName}</span>,{' '}
+          <span className="clock-date">{formatDateTime(currentTime).formattedDate}</span>{' '}
+          <span className="clock-time">{formatDateTime(currentTime).formattedTime}</span>
+        </div>
+        {/* Statystyki zamówień */}
+        <div className="order-stats">
+          <div className="stat-item">
+            <span className="stat-label">Offene Bestellungen:</span>
+            <span className="stat-value open">{stats.open}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Ausgelieferte Bestellungen:</span>
+            <span className="stat-value completed">{stats.completed}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Alle Bestellungen:</span>
+            <span className="stat-value total">{stats.total}</span>
+          </div>
+        </div>
+        
+        <div className="header-controls">
+          {category === 'pub' && (
+            <>
+              <div className="toggle-container">
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={showPizzeriaMenu}
+                    onChange={handlePizzeriaMenuToggle}
+                    disabled={loading}
+                  />
+                  <span className="slider"></span>
+                </label>
+                <span className="toggle-label">
+                  {showPizzeriaMenu ? 'Pizzeria Geöffnet' : 'Pizzeria Geschlossen'}
+                </span>
+              </div>
+              <div className="toggle-container">
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={showPubEssen}
+                    onChange={handlePubEssenToggle}
+                    disabled={loading}
+                  />
+                  <span className="slider"></span>
+                </label>
+                <span className="toggle-label">
+                  {showPubEssen ? 'PUB Küche Geöffnet' : 'PUB Küche Geschlossen'}
+                </span>
+              </div>
+              <div className="toggle-container">
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={!pubClosed}
+                    onChange={handlePubClosedToggle}
+                    disabled={loading}
+                  />
+                  <span className="slider"></span>
+                </label>
+                <span className="toggle-label">
+                  {!pubClosed ? 'PUB Geöffnet' : 'PUB Geschlossen'}
+                </span>
+              </div>
+              {hasFullyDeliveredOrders && (
+                <button onClick={archiveAllDelivered} className="btn archive-all-btn">
+                  Alle Ausgelieferten ausblenden
+                </button>
+              )}
+            </>
+          )}
+          {category === 'pizzeria' && (
+            <div className="toggle-container">
+              <label className="toggle-switch">
+                <input
+                  type="checkbox"
+                  checked={showPizzeriaMenu}
+                  onChange={handlePizzeriaMenuToggle}
+                  disabled={loading}
+                />
+                <span className="slider"></span>
+              </label>
+              <span className="toggle-label">
+                {showPizzeriaMenu ? 'Pizzeria Geöffnet' : 'Pizzeria Geschlossen'}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
-      <div className="order-list">
+      <div className="order-grid">
         {loading ? (
           <p className="no-orders">Lade Daten...</p>
         ) : orders.length === 0 ? (
@@ -110,60 +363,106 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
         ) : (
           orders.map(order => {
             const pizzeriaItems = order.items.filter(item => item.category === 'pizzeria');
-            const pubItems = order.items.filter(item => item.category === 'pub');
+            const pubEssenItems = order.items.filter(item => item.category === 'pub-essen');
+            const pubTrinkenItems = order.items.filter(item => item.category === 'pub-trinken');
+            const allPubItems = [...pubEssenItems, ...pubTrinkenItems];
             const currentSectionStatus = category === 'pub' ? order.pubStatus : order.pizzeriaStatus;
 
-            const hasPubItems = pubItems.length > 0;
-            const hasPizzeriaItems = pizzeriaItems.length > 0;
+            const hasPubItems = allPubItems.length > 0;
+            const hasPizzeriaItems = order.items.some(item => item.category === 'pizzeria');
             const isPubDelivered = !hasPubItems || order.pubStatus === 'delivered';
             const isPizzeriaDelivered = !hasPizzeriaItems || order.pizzeriaStatus === 'delivered';
             const isFullyDelivered = isPubDelivered && isPizzeriaDelivered;
 
+            const displayOrderNumber = order.orderNumber 
+              ? `#${String(order.orderNumber).padStart(4, '0')}` 
+              : order.id.substring(0, 8);
+
+            // Format date with day of week
+            const orderDate = new Date(order.createdAt);
+            const { dayName, formattedDate, formattedTime } = formatDateTime(orderDate);
+
             return (
               <div key={order.id} className="order-card">
                 <div className="order-header">
-                  <h3>Bestellung #{order.id.substring(0, 8)} (Tisch {order.tableNumber})</h3>
-                  <p className="order-time">
-                    {new Date(order.createdAt).toLocaleTimeString('de-DE')}
-                  </p>
+                  <div className="order-number">
+                    <h3>{displayOrderNumber}</h3>
+                    <span className="table-number">Tisch {order.tableNumber}</span>
+                  </div>
+                  <div className="order-time-info">
+                    <div className="order-date">
+                      {formattedDate}
+                    </div>
+                    <div className="time-elapsed">
+                      <span className="elapsed-label">Bestellung aufgegeben:</span> {formatTimeElapsed(order.createdAt)}
+                    </div>
+                  </div>
                 </div>
                 
-                <div className="order-details">
+                <div className="order-content">
                   {pizzeriaItems.length > 0 && (
-                    <div className={`order-category-section ${category === 'pub' ? 'secondary' : ''}`}>
+                    <div className={`order-section ${category === 'pub' ? 'secondary' : 'primary'}`}>
                       <div className="section-header">
-                        <h4>Von der Pizzeria:</h4>
-                          <span 
-                            className="status-badge"
-                            style={{ backgroundColor: getStatusColor(order.pizzeriaStatus) }}
-                          >
-                            {getStatusText(order.pizzeriaStatus)}
-                          </span>
+                        <span className="section-title">🍕 Pizzeria</span>
+                        <span 
+                          className="status-badge"
+                          style={{ backgroundColor: getStatusColor(order.pizzeriaStatus) }}
+                        >
+                          {getStatusText(order.pizzeriaStatus)}
+                        </span>
                       </div>
-                      <ul>
+                      <div className="items-list">
                         {pizzeriaItems.map((item, index) => (
-                          <li key={`${item.menuItemId}-${index}`}>{item.quantity} x {item.name}</li>
+                          <div key={`${item.menuItemId}-${index}`} className="item">
+                            <span className="quantity">{item.quantity}x</span>
+                            <span className="item-name">{item.name}</span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
 
-                  {pubItems.length > 0 && (
-                    <div className={`order-category-section ${category === 'pizzeria' ? 'secondary' : ''}`}>
+                  {pubEssenItems.length > 0 && (
+                    <div className={`order-section ${category === 'pizzeria' ? 'secondary' : 'primary'}`}>
                       <div className="section-header">
-                        <h4>Vom Pub:</h4>
-                          <span 
-                            className="status-badge"
-                            style={{ backgroundColor: getStatusColor(order.pubStatus) }}
-                          >
-                            {getStatusText(order.pubStatus)}
-                          </span>
+                        <span className="section-title">🍽️ PUB Essen</span>
+                        <span 
+                          className="status-badge"
+                          style={{ backgroundColor: getStatusColor(order.pubStatus) }}
+                        >
+                          {getStatusText(order.pubStatus)}
+                        </span>
                       </div>
-                      <ul>
-                        {pubItems.map((item, index) => (
-                          <li key={`${item.menuItemId}-${index}`}>{item.quantity} x {item.name}</li>
+                      <div className="items-list">
+                        {pubEssenItems.map((item, index) => (
+                          <div key={`${item.menuItemId}-${index}`} className="item">
+                            <span className="quantity">{item.quantity}x</span>
+                            <span className="item-name">{item.name}</span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  {pubTrinkenItems.length > 0 && (
+                    <div className={`order-section ${category === 'pizzeria' ? 'secondary' : 'primary'}`}>
+                      <div className="section-header">
+                        <span className="section-title">🍺 PUB Trinken</span>
+                        <span 
+                          className="status-badge"
+                          style={{ backgroundColor: getStatusColor(order.pubStatus) }}
+                        >
+                          {getStatusText(order.pubStatus)}
+                        </span>
+                      </div>
+                      <div className="items-list">
+                        {pubTrinkenItems.map((item, index) => (
+                          <div key={`${item.menuItemId}-${index}`} className="item">
+                            <span className="quantity">{item.quantity}x</span>
+                            <span className="item-name">{item.name}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -185,12 +484,12 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
                       Ausgeliefert
                     </button>
                   )}
-                  {isFullyDelivered && (
+                  {isFullyDelivered && category === 'pub' && (
                      <button 
                       onClick={() => archiveOrder(order.id)} 
                       className="action-btn archive-btn"
                     >
-                      Ausblenden
+                      ✓
                     </button>
                   )}
                   {!isFullyDelivered && (
@@ -198,7 +497,7 @@ const StaffPanel: React.FC<{ category: 'pub' | 'pizzeria' }> = ({ category }) =>
                       onClick={() => cancelOrder(order.id)} 
                       className="action-btn cancel-btn"
                     >
-                      Stornieren
+                      ✕
                     </button>
                   )}
                 </div>

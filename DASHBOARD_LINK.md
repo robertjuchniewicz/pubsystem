@@ -28,7 +28,7 @@
 - Liczba aktywnych zamówień
 
 #### **🍽️ Speisekarte verwalten:**
-- Link do Admin Panel
+- Link do Speisekarte Panel
 - Statystyki menu (8 PUB + 8 Pizzeria artykułów)
 - Status dostępności
 
@@ -57,7 +57,7 @@
 - **Dashboard:** http://localhost:3000
 - **PUB Panel:** http://localhost:3000/staff/pub  
 - **Pizzeria Panel:** http://localhost:3000/staff/pizzeria
-- **Admin Panel:** http://localhost:3000/admin
+- **Speisekarte Panel:** http://localhost:3000/speisekarte
 - **QR Generator:** http://localhost:3000/qr-labels
 - **Kunden-Bestellung (Tisch 7):** http://localhost:3000/table/7
 

@@ -1,0 +1,1020 @@
+[
+  {
+    "id": "a2efc72e-f5ef-4fc6-976c-a51e5181f61b",
+    "orderNumber": 23,
+    "tableNumber": 4,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 4,
+        "name": "Nüssler Salat mit Speckwürfeli, Ei & Croûtons",
+        "price": 12.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 500ml",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub-trinken"
+      }
+    ],
+    "createdAt": "2025-06-23T13:09:49.978Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-23T13:10:51.559Z"
+  },
+  {
+    "id": "558d098a-6c8f-4664-8f7d-51958a7fe5bb",
+    "orderNumber": 20,
+    "tableNumber": 5,
+    "items": [
+      {
+        "menuItemId": 35,
+        "name": "Contadina",
+        "price": 17.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 500ml",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub-trinken"
+      },
+      {
+        "menuItemId": 39,
+        "name": "Sandwich Club",
+        "price": 8,
+        "quantity": 1,
+        "category": "pub-essen"
+      }
+    ],
+    "createdAt": "2025-06-23T12:19:09.210Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-23T12:59:39.996Z"
+  },
+  {
+    "id": "4f7abf4b-8af9-44d4-8f3b-a28064ebc48a",
+    "orderNumber": 19,
+    "tableNumber": 1,
+    "items": [
+      {
+        "menuItemId": 35,
+        "name": "Contadina",
+        "price": 17.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 500ml",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub-trinken"
+      },
+      {
+        "menuItemId": 39,
+        "name": "Sandwich Club",
+        "price": 8,
+        "quantity": 1,
+        "category": "pub-essen"
+      }
+    ],
+    "createdAt": "2025-06-23T12:18:45.914Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-23T12:59:39.996Z"
+  },
+  {
+    "id": "887b93eb-a34b-41d7-9c5a-6b23ffcfd110",
+    "orderNumber": 18,
+    "tableNumber": 1,
+    "items": [
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 500ml",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub-trinken"
+      },
+      {
+        "menuItemId": 39,
+        "name": "Sandwich Club",
+        "price": 8,
+        "quantity": 1,
+        "category": "pub-essen"
+      }
+    ],
+    "createdAt": "2025-06-23T12:18:31.576Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "pending",
+    "deliveredAt": "2025-06-23T12:59:39.996Z"
+  },
+  {
+    "id": "13a94492-7dc3-4e12-9f51-d64c5f503cb3",
+    "orderNumber": 22,
+    "tableNumber": 3,
+    "items": [
+      {
+        "menuItemId": 2,
+        "name": "Gemischter Salat",
+        "price": 9.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 500ml",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub-trinken"
+      },
+      {
+        "menuItemId": 39,
+        "name": "Sandwich Club",
+        "price": 8,
+        "quantity": 1,
+        "category": "pub-essen"
+      }
+    ],
+    "createdAt": "2025-06-23T12:58:18.614Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "pending",
+    "canceledAt": "2025-06-23T12:59:22.729Z"
+  },
+  {
+    "id": "6606d152-cb19-407d-a21f-a756ea626afd",
+    "orderNumber": 21,
+    "tableNumber": 1,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 500ml",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub-trinken"
+      },
+      {
+        "menuItemId": 39,
+        "name": "Sandwich Club",
+        "price": 8,
+        "quantity": 1,
+        "category": "pub-essen"
+      }
+    ],
+    "createdAt": "2025-06-23T12:58:09.519Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "pending",
+    "canceledAt": "2025-06-23T12:59:19.873Z"
+  },
+  {
+    "id": "58f3597c-2077-4874-a35a-8a0218af7e8c",
+    "orderNumber": 17,
+    "tableNumber": 1,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 6,
+        "name": "Pilzcrèmesuppe",
+        "price": 9,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T21:33:21.193Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "pending",
+    "canceledAt": "2025-06-23T12:17:13.858Z"
+  },
+  {
+    "id": "c5d1eda8-ed28-400c-8d91-dc6623d992e1",
+    "orderNumber": 15,
+    "tableNumber": 2,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T18:16:47.702Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "delivered",
+    "canceledAt": "2025-06-23T12:17:12.023Z"
+  },
+  {
+    "id": "5bab654c-d873-4405-941b-b43187a57b7a",
+    "orderNumber": 16,
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "5",
+        "name": "Tomatencrèmesuppe",
+        "price": 9,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T18:19:27.919Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-23T10:22:53.143Z"
+  },
+  {
+    "id": "523f2970-3c3e-4fa1-b684-832c1d68c1bc",
+    "orderNumber": 14,
+    "tableNumber": 2,
+    "items": [
+      {
+        "menuItemId": 2,
+        "name": "Gemischter Salat",
+        "price": 9.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T18:15:41.805Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-23T10:22:53.143Z"
+  },
+  {
+    "id": "44d4a678-d9c2-4c6a-a946-982de5789f43",
+    "orderNumber": 13,
+    "tableNumber": 2,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T18:14:37.443Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-23T10:22:53.143Z"
+  },
+  {
+    "id": "de7aa71e-c511-47cd-9670-c78da55e7e6d",
+    "orderNumber": 11,
+    "tableNumber": 1,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T18:12:12.146Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-23T10:22:53.143Z"
+  },
+  {
+    "id": "82d8a967-fc7f-46bf-aa7b-46b181c097e5",
+    "orderNumber": 12,
+    "tableNumber": 2,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T18:13:00.850Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "ready",
+    "canceledAt": "2025-06-22T21:30:23.132Z"
+  },
+  {
+    "id": "ea345d57-567a-4855-9938-3d96a598123e",
+    "orderNumber": 10,
+    "tableNumber": 1,
+    "items": [
+      {
+        "menuItemId": 2,
+        "name": "Gemischter Salat",
+        "price": 9.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 5,
+        "name": "Tomatencrèmesuppe",
+        "price": 9,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 38,
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:47:53.900Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "pending",
+    "canceledAt": "2025-06-22T16:48:05.685Z"
+  },
+  {
+    "id": "091bdf91-3951-4cfd-a304-4aa25dce7ba0",
+    "orderNumber": 8,
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "22",
+        "name": "Portion Pommes",
+        "price": 7,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:44:30.568Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "pending",
+    "canceledAt": "2025-06-22T16:44:46.470Z"
+  },
+  {
+    "id": "7e2df4eb-df2c-4c90-bd6e-0c8b874bd69e",
+    "orderNumber": 9,
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:44:33.616Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "pending",
+    "deliveredAt": "2025-06-22T16:44:44.015Z"
+  },
+  {
+    "id": "ae199ba9-29ad-44ed-98dc-aeb315969b81",
+    "orderNumber": 6,
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "1",
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:18:43.103Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "pending",
+    "canceledAt": "2025-06-22T16:19:20.504Z"
+  },
+  {
+    "id": "7871af1a-348b-4da4-8b71-af6432f3605a",
+    "orderNumber": 7,
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:18:47.842Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "pending",
+    "deliveredAt": "2025-06-22T16:19:07.623Z"
+  },
+  {
+    "id": "4cbd4643-1241-466e-b08e-5dd5fcbff047",
+    "orderNumber": 5,
+    "tableNumber": "33",
+    "items": [
+      {
+        "menuItemId": "22",
+        "name": "Portion Pommes",
+        "price": 7,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:09:21.182Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T16:09:48.191Z"
+  },
+  {
+    "id": "2f304bbc-af0e-44ca-ab69-6e8eeb937667",
+    "orderNumber": 4,
+    "tableNumber": "33",
+    "items": [
+      {
+        "menuItemId": "22",
+        "name": "Portion Pommes",
+        "price": 7,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:03:17.524Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T16:03:43.045Z"
+  },
+  {
+    "id": "c0641837-862e-45ee-ac91-fe70db1447e3",
+    "orderNumber": 3,
+    "tableNumber": "33",
+    "items": [
+      {
+        "menuItemId": "22",
+        "name": "Portion Pommes",
+        "price": 7,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T16:03:13.979Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T16:03:41.958Z"
+  },
+  {
+    "id": "10f1b5a1-b742-4ed0-b331-e189feb8703b",
+    "orderNumber": 2,
+    "tableNumber": "33",
+    "items": [
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      },
+      {
+        "menuItemId": "22",
+        "name": "Portion Pommes",
+        "price": 7,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "createdAt": "2025-06-22T15:59:37.187Z",
+    "completed": true,
+    "status": "canceled",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "pending",
+    "canceledAt": "2025-06-22T15:59:51.847Z"
+  },
+  {
+    "id": "b219c9ed-c46b-4bab-bc1c-d10670a2612d",
+    "orderNumber": 1,
+    "tableNumber": "33",
+    "items": [
+      {
+        "menuItemId": "2",
+        "name": "Gemischter Salat",
+        "price": 9.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "createdAt": "2025-06-22T15:57:20.281Z",
+    "completed": true,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:59:13.130Z"
+  },
+  {
+    "id": "d06fb313-0eca-4322-b353-380d452274d9",
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "1",
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "2",
+        "name": "Gemischter Salat",
+        "price": 9.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "timestamp": "2025-06-22T15:26:53.829Z",
+    "createdAt": "2025-06-22T15:26:53.829Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:30:40.503Z"
+  },
+  {
+    "id": "5617ecde-9d37-46b5-a41c-b5850ab75ff1",
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      },
+      {
+        "menuItemId": "25",
+        "name": "Fiorentina",
+        "price": 16,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "timestamp": "2025-06-22T15:29:34.466Z",
+    "createdAt": "2025-06-22T15:29:34.466Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:41:52.326Z"
+  },
+  {
+    "id": "a186f7bf-2229-4f90-b818-4bbd183bede3",
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "37",
+        "name": "Chicken",
+        "price": 18.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "timestamp": "2025-06-22T15:28:08.752Z",
+    "createdAt": "2025-06-22T15:28:08.752Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:41:53.040Z"
+  },
+  {
+    "id": "17a4bb38-d05f-42ca-8948-fbdf6348501b",
+    "tableNumber": "1",
+    "items": [
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      },
+      {
+        "menuItemId": "31",
+        "name": "Al Tonno",
+        "price": 17,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "21",
+        "name": "Pouletbrust inkl. Pommes",
+        "price": 22,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "timestamp": "2025-06-22T15:38:34.329Z",
+    "createdAt": "2025-06-22T15:38:34.329Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:41:54.024Z"
+  },
+  {
+    "id": "4434af74-5b00-4768-ac32-c1be9801a986",
+    "tableNumber": "2",
+    "items": [
+      {
+        "menuItemId": "4",
+        "name": "Nüssler Salat mit Speckwürfeli, Ei & Croûtons",
+        "price": 12.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "timestamp": "2025-06-22T15:40:41.109Z",
+    "createdAt": "2025-06-22T15:40:41.109Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:41:54.682Z"
+  },
+  {
+    "id": "94799778-627d-4e25-a4be-fefebdd0959f",
+    "tableNumber": "2",
+    "items": [
+      {
+        "menuItemId": "1",
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "timestamp": "2025-06-22T15:49:14.707Z",
+    "createdAt": "2025-06-22T15:49:14.707Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:51:23.332Z"
+  },
+  {
+    "id": "8ff276bb-2d3a-4569-9159-80e7fb4c6180",
+    "tableNumber": "5",
+    "items": [
+      {
+        "menuItemId": "8",
+        "name": "Salat Teller",
+        "price": 14,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "2",
+        "name": "Gemischter Salat",
+        "price": 9.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "timestamp": "2025-06-22T15:49:25.430Z",
+    "createdAt": "2025-06-22T15:49:25.430Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:51:24.157Z"
+  },
+  {
+    "id": "b33d5819-f50e-4666-986d-a21657e2aee1",
+    "tableNumber": "11",
+    "items": [
+      {
+        "menuItemId": "7",
+        "name": "Tomaten-/Mozzarella Salat",
+        "price": 11.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "1",
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "timestamp": "2025-06-22T15:53:57.634Z",
+    "createdAt": "2025-06-22T15:53:57.634Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:54:30.623Z"
+  },
+  {
+    "id": "e1f0aa7e-7b8c-4242-a063-3aa306e85db7",
+    "tableNumber": "33",
+    "items": [
+      {
+        "menuItemId": "7",
+        "name": "Tomaten-/Mozzarella Salat",
+        "price": 11.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "4",
+        "name": "Nüssler Salat mit Speckwürfeli, Ei & Croûtons",
+        "price": 12.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "timestamp": "2025-06-22T15:54:05.157Z",
+    "createdAt": "2025-06-22T15:54:05.157Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:54:34.531Z"
+  },
+  {
+    "id": "dc4edba9-9cd9-461c-8d9a-d62e8f02f06b",
+    "tableNumber": "5",
+    "items": [
+      {
+        "menuItemId": "22",
+        "name": "Portion Pommes",
+        "price": 7,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": "38",
+        "name": "Rugen Brau 50dl",
+        "price": 5,
+        "quantity": 1,
+        "category": "pub"
+      }
+    ],
+    "timestamp": "2025-06-22T15:53:51.481Z",
+    "createdAt": "2025-06-22T15:53:51.481Z",
+    "completed": false,
+    "status": "completed",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered",
+    "deliveredAt": "2025-06-22T15:54:44.736Z"
+  },
+  {
+    "id": "34298229-f047-4052-bd41-deab147e8f6c",
+    "orderNumber": 24,
+    "tableNumber": 3,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 4,
+        "name": "Nüssler Salat mit Speckwürfeli, Ei & Croûtons",
+        "price": 12.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "createdAt": "2025-06-23T13:25:43.892Z",
+    "completed": false,
+    "status": "archived",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "delivered"
+  },
+  {
+    "id": "7efbcb44-1fea-47cc-9d21-1ff8fb7ad12e",
+    "orderNumber": 25,
+    "tableNumber": 1,
+    "items": [
+      {
+        "menuItemId": 1,
+        "name": "Grüner Salat",
+        "price": 8.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 4,
+        "name": "Nüssler Salat mit Speckwürfeli, Ei & Croûtons",
+        "price": 12.5,
+        "quantity": 1,
+        "category": "pizzeria"
+      }
+    ],
+    "createdAt": "2025-06-23T13:28:57.296Z",
+    "completed": false,
+    "status": "archived",
+    "pubStatus": "delivered",
+    "pizzeriaStatus": "delivered"
+  },
+  {
+    "id": "3c2b3c0e-4a97-4286-80cf-369342e32ab6",
+    "orderNumber": 26,
+    "tableNumber": 4,
+    "items": [
+      {
+        "menuItemId": 3,
+        "name": "Tomaten Salat",
+        "price": 10.5,
+        "quantity": 2,
+        "category": "pizzeria"
+      },
+      {
+        "menuItemId": 8,
+        "name": "Salat Teller",
+        "price": 14,
+        "quantity": 2,
+        "category": "pizzeria"
+      }
+    ],
+    "createdAt": "2025-06-23T13:29:06.218Z",
+    "completed": false,
+    "status": "archived",
+    "pubStatus": "pending",
+    "pizzeriaStatus": "delivered"
+  }
+]
